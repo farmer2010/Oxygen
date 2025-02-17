@@ -29,7 +29,8 @@ public class World extends JPanel{
 	SimplexNoise noise = new SimplexNoise(0);//шум
 	Bot[][] Map = new Bot[Constant.world_scale[0]][Constant.world_scale[1]];//мир
 	double[][] oxygen_map;//кислород
-	double[][] org_map;//органика
+	double[][] co2_map;//углекислота
+	int[][] org_map;//органика
 	double[][] mnr_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];//минералы
 	int[][] height_map = new int[Constant.world_scale[0]][Constant.world_scale[1]];//карта высот
 	//цвета
@@ -137,6 +138,11 @@ public class World extends JPanel{
         mnr_button.setBounds(Constant.W - 300, 305, 95, 20);
         add(mnr_button);
         //
+        JButton co2_button = new JButton("Co2");
+        co2_button.addActionListener(new change_gas_draw_type(4));
+        co2_button.setBounds(Constant.W - 200, 305, 95, 20);
+        add(co2_button);
+        //
         //смена функции мыши
         //
         JButton select_button = new JButton("Select");
@@ -166,8 +172,8 @@ public class World extends JPanel{
         show_brain_button.setEnabled(false);
         add(show_brain_button);
         //
-        //
         //поля для ввода(для сохранения/загрузки)
+        //
         JTextField for_save = new JTextField();
         for_save.setBounds(Constant.W - 300, 465, 250, 20);
         add(for_save);
@@ -235,7 +241,7 @@ public class World extends JPanel{
 		timer.start();
 	}
 	//
-	//
+	//ОТРИСОВКА
 	//
 	public void paintComponent(Graphics canvas) {
 		super.paintComponent(canvas);
@@ -247,11 +253,15 @@ public class World extends JPanel{
 		if (render) {//рисуем фон и ботов
 			if (gas_draw_type != 0) {
 				if (gas_draw_type == 1) {
-					draw_ox(canvas, zoom);
+					Draw.draw_ox(canvas, oxygen_map, org_map, zoom, zoom_disp_pos);
 				}else if (gas_draw_type == 2){
-					draw_org(canvas, zoom);
+					Draw.draw_org(canvas, org_map, zoom, zoom_disp_pos);
 				}else if (gas_draw_type == 3) {
-					draw_mnr(canvas);
+					Draw.draw_mnr(canvas, mnr_map);
+				}else if (gas_draw_type == 4) {
+					Draw.draw_co2(canvas, co2_map, org_map, zoom, zoom_disp_pos);
+				}else if (gas_draw_type == 5) {
+					Draw.draw_height(canvas, height_map, zoom, zoom_disp_pos);
 				}
 			}else {
 				//draw_height(canvas, zoom);
@@ -327,9 +337,9 @@ public class World extends JPanel{
 			g2d.setColor(Color.WHITE);
 			g2d.fillRect(0, 0, 1000, 1000);
 			if (i != 1) {
-				draw_ox(g2d, 0);
+				Draw.draw_ox(g2d, oxygen_map, org_map, zoom, zoom_disp_pos);
 			}else {
-				draw_org(g2d, 0);
+				Draw.draw_org(g2d, org_map, zoom, zoom_disp_pos);
 			}
 			for(Bot b: objects) {
 				int dt = 0;
@@ -348,105 +358,6 @@ public class World extends JPanel{
 			ImageIO.write(buff[3], "png", new File("record/energy/screen" + String.valueOf(steps / 25)+ ".png"));
 		}catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-	//
-	//ФУНКЦИИ ДЛЯ РИСОВАНИЯ
-	//
-	public void draw_ox(Graphics canvas, int z) {
-		int w = Constant.world_scale[0] * Constant.size / Constant.zoom_sizes[zoom];
-		int h = Constant.world_scale[1] * Constant.size / Constant.zoom_sizes[zoom];
-		for (int i = 0; i < Constant.world_scale[0] * Constant.size / Constant.zoom_sizes[zoom]; i++) {
-			for (int j = 0; j < Constant.world_scale[1] * Constant.size / Constant.zoom_sizes[zoom]; j++) {
-				if (zoom == 0) {//зум 1x
-					int x = i;
-					int y = j;
-					double ox = oxygen_map[x][y];
-					if (ox > Constant.ox_render_maximum_coeff) {
-						ox = Constant.ox_render_maximum_coeff;
-					}
-					canvas.setColor(new Color(255 - (int)(ox * 255 * (1 / Constant.ox_render_maximum_coeff)), 255 - (int)(ox * 255 * (1 / Constant.ox_render_maximum_coeff)), 255));
-					canvas.fillRect(x * Constant.size, y * Constant.size, Constant.size, Constant.size);
-					if (org_map[x][y] >= Constant.org_die_level) {
-						canvas.setColor(new Color(90, 0, 0));
-						canvas.fillRect(x * Constant.size, y * Constant.size, Constant.size, Constant.size);
-					}
-				}else {//зум 2.5x - 5x
-					int x = i + zoom_disp_pos[0] - w / 2;
-					int y = j + zoom_disp_pos[1] - h / 2;
-					double ox = oxygen_map[x][y];
-					if (ox > Constant.ox_render_maximum_coeff) {
-						ox = Constant.ox_render_maximum_coeff;
-					}
-					canvas.setColor(new Color(255 - (int)(ox * 255 * (1 / Constant.ox_render_maximum_coeff)), 255 - (int)(ox * 255 * (1 / Constant.ox_render_maximum_coeff)), 255));
-					canvas.fillRect(i * Constant.zoom_sizes[zoom], j * Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom]);
-					if (org_map[x][y] >= Constant.org_die_level) {
-						canvas.setColor(new Color(90, 0, 0));
-						canvas.fillRect(i * Constant.zoom_sizes[zoom], j * Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom]);
-					}
-				}
-			}
-		}
-	}
-	//
-	public void draw_org(Graphics canvas, int z) {
-		int w = Constant.world_scale[0] * Constant.size / Constant.zoom_sizes[zoom];
-		int h = Constant.world_scale[1] * Constant.size / Constant.zoom_sizes[zoom];
-		for (int i = 0; i < Constant.world_scale[0] * Constant.size / Constant.zoom_sizes[zoom]; i++) {
-			for (int j = 0; j < Constant.world_scale[1] * Constant.size / Constant.zoom_sizes[zoom]; j++) {
-				if (zoom == 0) {//зум 1x
-					int x = i;
-					int y = j;
-					int gr = Constant.border(255 - (int)(org_map[x][y] / Constant.org_die_level * 255), 255, 0);
-					if (gr < 255) {
-						canvas.setColor(new Color(gr, gr, gr));
-						canvas.fillRect(x * Constant.zoom_sizes[zoom], y * Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom]);
-					}
-				}else {//зум 2.5x - 5x
-					int x = i + zoom_disp_pos[0] - w / 2;
-					int y = j + zoom_disp_pos[1] - h / 2;
-					int gr = Constant.border(255 - (int)(org_map[x][y] / Constant.org_die_level * 255), 255, 0);
-					if (gr < 255) {
-						canvas.setColor(new Color(gr, gr, gr));
-						canvas.fillRect(i * Constant.zoom_sizes[zoom], j * Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom]);
-					}
-				}
-			}
-		}
-	}
-	//
-	public void draw_mnr(Graphics canvas) {
-		for (int x = 0; x < Constant.world_scale[0]; x++) {
-			for (int y = 0; y < Constant.world_scale[1]; y++) {
-				canvas.setColor(new Color(255 - (int)(mnr_map[x][y] / 1000 * 255), 255 - (int)(mnr_map[x][y] / 1000 * 255), 255));
-				canvas.fillRect(x * Constant.size, y * Constant.size, Constant.size, Constant.size);
-			}
-		}
-	}
-	//
-	public void draw_height(Graphics canvas, int z) {
-		int w = Constant.world_scale[0] * Constant.size / Constant.zoom_sizes[zoom];
-		int h = Constant.world_scale[1] * Constant.size / Constant.zoom_sizes[zoom];
-		for (int i = 0; i < Constant.world_scale[0] * Constant.size / Constant.zoom_sizes[zoom]; i++) {
-			for (int j = 0; j < Constant.world_scale[1] * Constant.size / Constant.zoom_sizes[zoom]; j++) {
-				if (zoom == 0) {//зум 1x
-					int x = i;
-					int y = j;
-					int gr = Constant.border(255 - (int)(height_map[x][y] / 1000.0 * 255), 255, 0);
-					if (gr < 255) {
-						canvas.setColor(new Color(gr, gr, gr));
-						canvas.fillRect(x * Constant.zoom_sizes[zoom], y * Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom]);
-					}
-				}else {//зум 2.5x - 5x
-					int x = i + zoom_disp_pos[0] - w / 2;
-					int y = j + zoom_disp_pos[1] - h / 2;
-					int gr = Constant.border(255 - (int)(height_map[x][y] / 1000.0 * 255), 255, 0);
-					if (gr < 255) {
-						canvas.setColor(new Color(gr, gr, gr));
-						canvas.fillRect(i * Constant.zoom_sizes[zoom], j * Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom]);
-					}
-				}
-			}
 		}
 	}
 	//
@@ -528,7 +439,7 @@ public class World extends JPanel{
 			ListIterator<Bot> bot_iterator = objects.listIterator();
 			while (bot_iterator.hasNext()) {
 				Bot next_bot = bot_iterator.next();
-				next_bot.Update(bot_iterator, oxygen_map, org_map, mnr_map);
+				next_bot.Update(bot_iterator);
 				if (selection != null) {
 					if (next_bot.xpos == selection.xpos && next_bot.ypos == selection.ypos) {
 						if (next_bot != selection) {
@@ -556,8 +467,8 @@ public class World extends JPanel{
 				}
 			}
 			//
-			oxygen();
-			//minerals();
+			WorldUtils.gas(oxygen_map);
+			//WorldUtils.minerals(mnr_map);
 			//
 			if (rec && steps % 25 == 0) {
 				record();
@@ -581,6 +492,7 @@ public class World extends JPanel{
 				show_brain_button.setEnabled(false);
 				sh_brain = false;
 			}
+			//
 			if (zoom == 0) {
 				zoom_disp_pos[0] = botpos[0];
 				zoom_disp_pos[1] = botpos[1];
@@ -610,74 +522,9 @@ public class World extends JPanel{
 		}
 	}
 	//
-	//ЛОГИКА КИСЛОРОДА И МИНЕРАЛОВ
-	//
-	public void minerals() {//минералы
-		//приход минералов
-		int ymin = Constant.world_scale[1] - Constant.world_scale[1] / 8 * 2;
-		for (int i = 0; i < 100; i++) {
-			int x = rand.nextInt(Constant.world_scale[0]);
-			int y = rand.nextInt(ymin, Constant.world_scale[1]);
-			mnr_map[x][y] += rand.nextInt(10, 30);
-			if (mnr_map[x][y] > 1000) {
-				mnr_map[x][y] = 1000;
-			}
-		}
-		//логика
-		double[][] new_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
-		for (int x = 0; x < Constant.world_scale[0]; x++) {
-			for (int y = 0; y < Constant.world_scale[1]; y++) {
-				if (mnr_map[x][y] > 0) {
-					
-				}
-			}
-		}
-		mnr_map = new_map;
-	}
-	//
-	public void oxygen() {//распространение кислорода
-		double[][] new_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
-		for (int x = 0; x < Constant.world_scale[0]; x++) {
-			for (int y = 0; y < Constant.world_scale[1]; y++) {
-				if (oxygen_map[x][y] >= Constant.ox_distribution_min) {
-					oxygen_map[x][y] *= Constant.evaporation_ox_coeff;//испарение
-					int count = 1;
-					for (int i = 0; i < 8; i++) {
-						int[] f = {x, y};
-						int[] pos = Constant.get_rotate_position(i, f);
-						if (pos[1] >= 0 && pos[1] < Constant.world_scale[1]) {
-							count++;
-						}
-					}
-					double ox = oxygen_map[x][y] / count;
-					new_map[x][y] += ox;
-					if (new_map[x][y] > 1) {
-						new_map[x][y] = 1;
-					}
-					for (int i = 0; i < 8; i++) {
-						int[] f = {x, y};
-						int[] pos = Constant.get_rotate_position(i, f);
-						if (pos[1] >= 0 && pos[1] < Constant.world_scale[1]) {
-							new_map[pos[0]][pos[1]] += ox;
-							if (new_map[pos[0]][pos[1]] > 1) {
-								new_map[pos[0]][pos[1]] = 1;
-							}
-						}
-					}
-				}else {
-					new_map[x][y] += oxygen_map[x][y];
-					if (new_map[x][y] > 1) {
-						new_map[x][y] = 1;
-					}
-				}
-			}
-		}
-		oxygen_map = new_map;
-	}
-	//
 	//ФУНКЦИИ КНОПОК
 	//
-	public void newPopulation() {//создать случайныю популяцию
+	public void newPopulation() {//создать случайную популяцию
 		kill_all();
 		for (int i = 0; i < Constant.starting_bot_count; i++) {
 			while(true){
@@ -690,6 +537,9 @@ public class World extends JPanel{
 						new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256)),
 						1000,
 						0,
+						oxygen_map,
+						co2_map,
+						org_map,
 						Map,
 						objects
 					);
@@ -708,12 +558,14 @@ public class World extends JPanel{
 		SimplexNoise noise = new SimplexNoise(rand.nextInt(-1000000000, 1000000000));//шум
 		Map = new Bot[Constant.world_scale[0]][Constant.world_scale[1]];
 		oxygen_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
-		org_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
+		co2_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
+		org_map = new int[Constant.world_scale[0]][Constant.world_scale[1]];
 		mnr_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
 		//стартовые ресурсы
 		for (int x = 0; x < Constant.world_scale[0]; x++) {
 			for (int y = 0; y < Constant.world_scale[1]; y++) {
 				oxygen_map[x][y] = Constant.starting_ox;
+				co2_map[x][y] = Constant.starting_co2;
 				org_map[x][y] = Constant.starting_org;
 				mnr_map[x][y] = 0;
 				Map[x][y] = null;
@@ -797,6 +649,9 @@ public class World extends JPanel{
     				new Color(Integer.parseInt(bot_data[9]), Integer.parseInt(bot_data[10]), Integer.parseInt(bot_data[11])),
     				Integer.parseInt(bot_data[0]),
     				0,
+    				oxygen_map,
+    				co2_map,
+    				org_map,
     				Map,
     				objects
     			);

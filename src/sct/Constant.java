@@ -7,8 +7,10 @@ public class Constant {
 	public static int[] world_scale = {500, 500};
 	public static int starting_bot_count = 45000;
 	public static double starting_ox = 0.02;
-	public static double starting_org = 200;
+	public static double starting_co2 = 0.02;
+	public static int starting_org = 200;
 	public static double ox_render_maximum_coeff = 0.25;
+	public static double co2_render_maximum_coeff = 0.25;
 	public static String[] draw_type_names = {"predators", "energy", "color", "clans", "age", "types"};
 	public static String[] mouse_func_names = {"select", "set", "remove"};
 	public static int[] zoom_sizes = {2, 5, 10};
@@ -22,13 +24,17 @@ public class Constant {
 	public static double evaporation_ox_coeff = 0.98;
 	public static double ox_distribution_min = 0.001;
 	//
+	
+	//
 	public static int org_die_level = 800;
 	public static int age_minus_coeff = 10;
-	public static int pht_coeff = 400;
 	public static int energy_for_life = 1;
 	public static int energy_for_move = 1;
 	public static int energy_for_multiply = 20;
 	public static int energy_for_auto_multiply = 800;
+	public static int max_age = 1500;
+	//
+	public static int pht_coeff = 400;
 	public static int[] pht_energy_list = {10, 9, 8, 7, 6, 5, 4, 3};
 	public static double pht_neighbours_coeff = 0.1111;
 	public static double org_recycle_coeff = 1;
