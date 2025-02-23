@@ -42,8 +42,9 @@ public class World extends JPanel{
 	int obj_count = 0;//количество объектов
 	int org_count = 0;//количество семян
 	double count_ox = -1;//количество кислорода(под курсором)
-	double count_org = -1;//количество органики(под курсором)
+	int count_org = -1;//количество органики(под курсором)
 	double count_mnr = -1;//количество минералов(под курсором)
+	double count_co2 = -1;//количество углекислоты(под курсором)
 	int mouse = 0;//функция мыши
 	int draw_type = 0;//режим отрисовки
 	int gas_draw_type = 0;//режим отрисовки фона
@@ -291,6 +292,7 @@ public class World extends JPanel{
 		canvas.drawString("Zoom position: " + String.valueOf(zoom_disp_pos[0]) + ", " + String.valueOf(zoom_disp_pos[1]), Constant.W - 300, 740);
 		canvas.drawString("Oxygen: " + String.valueOf(count_ox), Constant.W - 300, 760);
 		canvas.drawString("Organics: " + String.valueOf(count_org), Constant.W - 300, 780);
+		canvas.drawString("Co2: " + String.valueOf(count_co2), Constant.W - 300, 800);
 		//
 		if (selection != null) {//данные о выбранном боте
 			canvas.drawString("energy: " + String.valueOf(selection.energy) + ", : " + String.valueOf(0), Constant.W - 300, 360);
@@ -403,12 +405,14 @@ public class World extends JPanel{
 				count_ox = oxygen_map[botpos[0]][botpos[1]];
 				count_org = org_map[botpos[0]][botpos[1]];
 				count_mnr = mnr_map[botpos[0]][botpos[1]];
+				count_co2 = co2_map[botpos[0]][botpos[1]];
 				//
 				update_mouse(botpos, 0);
 			}else {
 				count_ox = -1;
 				count_org = -1;
 				count_mnr = -1;
+				count_co2 = -1;
 			}
 		}
 		//
@@ -468,6 +472,7 @@ public class World extends JPanel{
 			}
 			//
 			WorldUtils.gas(oxygen_map);
+			WorldUtils.gas(co2_map);
 			//WorldUtils.minerals(mnr_map);
 			//
 			if (rec && steps % 25 == 0) {

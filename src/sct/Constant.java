@@ -24,18 +24,19 @@ public class Constant {
 	public static double evaporation_ox_coeff = 0.98;
 	public static double ox_distribution_min = 0.001;
 	//
-	
+	public static double life_co2_coeff = 0.001;
+	public static double pht_co2_coeff = 0.0003;
 	//
-	public static int org_die_level = 800;
+	public static double org_die_level = 800.0;
 	public static int age_minus_coeff = 10;
 	public static int energy_for_life = 1;
 	public static int energy_for_move = 1;
-	public static int energy_for_multiply = 20;
+	public static int energy_for_multiply = 50;
 	public static int energy_for_auto_multiply = 800;
 	public static int max_age = 1500;
 	//
-	public static int pht_coeff = 400;
-	public static int[] pht_energy_list = {10, 9, 8, 7, 6, 5, 4, 3};
+	public static double pht_coeff = 400;
+	public static int[] pht_energy_list = {12, 11, 10, 9, 8, 7, 6, 5};
 	public static double pht_neighbours_coeff = 0.1111;
 	public static double org_recycle_coeff = 1;
 	//

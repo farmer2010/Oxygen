@@ -18,7 +18,7 @@ public class Bot{
 	//
 	public Color color;//основные параметры
 	public Color clan_color = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
-	public int energy;
+	public double energy;
 	public int age = Constant.max_age;
 	public int memory = 0;
 	public int type;
@@ -38,7 +38,7 @@ public class Bot{
 	private double[][] oxygen_map;
 	private double[][] co2_map;
 	private int[][] org_map;
-	public Bot(int new_xpos, int new_ypos, Color new_color, int new_energy, int new_type, double[][] new_oxygen_map, double[][] new_co2_map, int[][] new_org_map, Bot[][] new_map, ArrayList<Bot> new_objects) {
+	public Bot(int new_xpos, int new_ypos, Color new_color, double new_energy, int new_type, double[][] new_oxygen_map, double[][] new_co2_map, int[][] new_org_map, Bot[][] new_map, ArrayList<Bot> new_objects) {
 		xpos = new_xpos;
 		ypos = new_ypos;
 		x = new_xpos * Constant.size;
@@ -87,6 +87,7 @@ public class Bot{
 				int count = bot_count() + 1;//автоматическое деление и мозг
 				if (count_oxygen() >= Constant.life_ox_coeff * count) {
 					oxygen_map[xpos][ypos] -= Constant.life_ox_coeff * count;
+					co2_map[xpos][ypos] += Constant.life_co2_coeff * count;
 					update_commands(iterator);//если хватило кислорода, выполняем команды
 					if (energy >= Constant.energy_for_auto_multiply) {//автоматическое деление
 						multiply(rotate, 0, 0, 0, iterator);
@@ -145,7 +146,7 @@ public class Bot{
 				index %= 64;
 			}else if (command == 2 || command == 3 || command == 4) {//фотосинтез
 				int sector = Constant.sector(ypos);
-				if (sector <= 7 && pht_org_block != 2) {
+				if (sector <= 7 && pht_org_block != 2 && count_co2() >= Constant.pht_co2_coeff) {
 					pht_org_block = 1;
 					energy += photo_energy(sector);
 					go_green();
@@ -153,6 +154,7 @@ public class Bot{
 					if (oxygen_map[xpos][ypos] > 1) {
 						oxygen_map[xpos][ypos] = 1;
 					}
+					co2_map[xpos][ypos] -= Constant.pht_co2_coeff;
 				}
 				index += 1;
 				index %= 64;
@@ -440,7 +442,7 @@ public class Bot{
 			if (map[pos[0]][pos[1]] != null && map[pos[0]][pos[1]].state == 0) {
 				Bot relative = map[pos[0]][pos[1]];
 				if (relative.killed == 0) {
-					int enr = relative.energy + energy;
+					double enr = relative.energy + energy;
 					relative.energy = enr / 2;
 					energy = enr / 2;
 				}
@@ -566,13 +568,18 @@ public class Bot{
 		return(ox);
 	}
 	//
-	public int photo_energy(int sector) {
+	public double count_co2() {
+		double co2 = co2_map[xpos][ypos] * (co2_map[xpos][ypos] / (oxygen_map[xpos][ypos] + co2_map[xpos][ypos]));
+		return(co2);
+	}
+	//
+	public double photo_energy(int sector) {
 		int count = bot_count();
 		double n = ((9 - count) * Constant.pht_neighbours_coeff);
 		if (n > 1) {
 			n = 1;
 		}
-		int enr = (int)(Constant.pht_energy_list[sector] * (org_map[xpos][ypos] / Constant.pht_coeff) * n);
+		double enr = Constant.pht_energy_list[sector] * (org_map[xpos][ypos] / Constant.pht_coeff) * n;
 		return(enr);
 	}
 	//
