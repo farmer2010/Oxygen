@@ -31,7 +31,7 @@ public class WorldUtils {
 		}
 	}
 	//
-	public static void gas(double[][] gas_map) {//распространение кислорода
+	public static void gas(double[][] gas_map, double[][] org_map) {//распространение кислорода
 		double[][] new_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
 		for (int x = 0; x < Constant.world_scale[0]; x++) {
 			for (int y = 0; y < Constant.world_scale[1]; y++) {

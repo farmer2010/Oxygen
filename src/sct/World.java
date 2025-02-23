@@ -30,7 +30,7 @@ public class World extends JPanel{
 	Bot[][] Map = new Bot[Constant.world_scale[0]][Constant.world_scale[1]];//мир
 	double[][] oxygen_map;//кислород
 	double[][] co2_map;//углекислота
-	int[][] org_map;//органика
+	double[][] org_map;//органика
 	double[][] mnr_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];//минералы
 	int[][] height_map = new int[Constant.world_scale[0]][Constant.world_scale[1]];//карта высот
 	//цвета
@@ -42,7 +42,7 @@ public class World extends JPanel{
 	int obj_count = 0;//количество объектов
 	int org_count = 0;//количество семян
 	double count_ox = -1;//количество кислорода(под курсором)
-	int count_org = -1;//количество органики(под курсором)
+	double count_org = -1;//количество органики(под курсором)
 	double count_mnr = -1;//количество минералов(под курсором)
 	double count_co2 = -1;//количество углекислоты(под курсором)
 	int mouse = 0;//функция мыши
@@ -471,8 +471,8 @@ public class World extends JPanel{
 				}
 			}
 			//
-			WorldUtils.gas(oxygen_map);
-			WorldUtils.gas(co2_map);
+			WorldUtils.gas(oxygen_map, org_map);
+			WorldUtils.gas(co2_map, org_map);
 			//WorldUtils.minerals(mnr_map);
 			//
 			if (rec && steps % 25 == 0) {
@@ -564,7 +564,7 @@ public class World extends JPanel{
 		Map = new Bot[Constant.world_scale[0]][Constant.world_scale[1]];
 		oxygen_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
 		co2_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
-		org_map = new int[Constant.world_scale[0]][Constant.world_scale[1]];
+		org_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
 		mnr_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
 		//стартовые ресурсы
 		for (int x = 0; x < Constant.world_scale[0]; x++) {

@@ -1,5 +1,7 @@
 package sct;
 
+import java.awt.Color;
+
 public class Constant {
 	public static int W = 1920;
 	public static int H = 1080;
@@ -10,7 +12,7 @@ public class Constant {
 	public static double starting_co2 = 0.02;
 	public static int starting_org = 200;
 	public static double ox_render_maximum_coeff = 0.25;
-	public static double co2_render_maximum_coeff = 0.25;
+	public static double co2_render_maximum_coeff = 0.125;
 	public static String[] draw_type_names = {"predators", "energy", "color", "clans", "age", "types"};
 	public static String[] mouse_func_names = {"select", "set", "remove"};
 	public static int[] zoom_sizes = {2, 5, 10};
@@ -59,6 +61,14 @@ public class Constant {
 		}
 		return(number);
 	}
+	public static double border(double number, double border1, double border2) {
+		if (number > border1) {
+			number = border1;
+		}else if (number < border2) {
+			number = border2;
+		}
+		return(number);
+	}
 	public static int sector(int y) {
 		int sec = y / (Constant.world_scale[1] / 8);
 		if (sec > 7) {
@@ -76,5 +86,11 @@ public class Constant {
 			pos[0] = 0;
 		}
 		return(pos);
+	}
+	public static Color gradient(Color color1, Color color2, double grad) {
+		int r = (int)(color1.getRed() * (1 - grad) + color2.getRed() * grad);
+		int g = (int)(color1.getGreen() * (1 - grad) + color2.getGreen() * grad);
+		int b = (int)(color1.getBlue() * (1 - grad) + color2.getBlue() * grad);
+		return(new Color(r, g, b));
 	}
 }

@@ -37,8 +37,8 @@ public class Bot{
 	//
 	private double[][] oxygen_map;
 	private double[][] co2_map;
-	private int[][] org_map;
-	public Bot(int new_xpos, int new_ypos, Color new_color, double new_energy, int new_type, double[][] new_oxygen_map, double[][] new_co2_map, int[][] new_org_map, Bot[][] new_map, ArrayList<Bot> new_objects) {
+	private double[][] org_map;
+	public Bot(int new_xpos, int new_ypos, Color new_color, double new_energy, int new_type, double[][] new_oxygen_map, double[][] new_co2_map, double[][] new_org_map, Bot[][] new_map, ArrayList<Bot> new_objects) {
 		xpos = new_xpos;
 		ypos = new_ypos;
 		x = new_xpos * Constant.size;
@@ -599,7 +599,7 @@ public class Bot{
 	public void die_with_organics() {//умереть с появлением органики
 		killed = 1;
 		map[xpos][ypos] = null;
-		double enr = Constant.energy_for_multiply / 9;
+		double enr = Constant.energy_for_multiply / 9.0;
 		for (int i = 0; i < 8; i++) {
 			int[] pos = get_rotate_position(i);
 			if (pos[1] >= 0 & pos[1] < Constant.world_scale[1]) {
@@ -637,17 +637,12 @@ public class Bot{
 			}else if (draw_type == 1) {//цвета
 				c = color;
 			}else if (draw_type == 2) {//энергии
-				int g = 255 - (int)(energy / 1000.0 * 255.0);
-				if (g > 255) {
-					g = 255;
-				}else if (g < 0) {
-					g = 0;
-				}
-				c = new Color(255, g, 0);
+				double g = Constant.border(energy / 1000.0, 1, 0);
+				c = Constant.gradient(new Color(255, 255, 0), new Color(255, 0, 0), g);
 			}else if (draw_type == 3) {//кланов
 				c = clan_color;
 			}else if (draw_type == 4) {//возраста
-				c = new Color((int)((age * 1.0) / Constant.max_age * 255.0), (int)((age * 1.0) / Constant.max_age * 255.0), 255 - (int)((age * 1.0) / Constant.max_age * 255.0));
+				c = Constant.gradient(new Color(0, 0, 255), new Color(255, 255, 0), (age * 1.0) / Constant.max_age);
 			}else if (draw_type == 5) {//типа
 				if (type == 0) {
 					c = new Color(0, 0, 255);
