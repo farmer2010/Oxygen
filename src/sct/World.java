@@ -381,12 +381,14 @@ public class World extends JPanel{
 				count_ox = oxygen_map[botpos[0]][botpos[1]];
 				count_org = org_map[botpos[0]][botpos[1]];
 				count_mnr = mnr_map[botpos[0]][botpos[1]];
+				count_co2 = co2_map[botpos[0]][botpos[1]];
 				//
 				update_mouse(botpos, 1);
 			}else {
 				count_ox = -1;
 				count_org = -1;
 				count_mnr = -1;
+				count_co2 = -1;
 			}
 		}
 		//
@@ -619,12 +621,10 @@ public class World extends JPanel{
 		try {
             FileReader fileReader = new FileReader("saved worlds/" + for_load.getText() + ".dat");
             BufferedReader bufferedReader = new BufferedReader(fileReader);
- 
             String line = bufferedReader.readLine();
- 
             bufferedReader.close();
-            
             String[] l = line.split(";");
+            //
             steps = Integer.parseInt(l[0]);
             objects = new ArrayList<Bot>();
     		Map = new Bot[Constant.world_scale[0]][Constant.world_scale[1]];
@@ -641,18 +641,26 @@ public class World extends JPanel{
     		for (int i = 0; i < organics.length; i++) {
     			String[] organics_col = organics[i].split("'");
     			for (int j = 0; j < organics_col.length; j++) {
-    				org_map[i][j] = Integer.parseInt(organics_col[j]);
+    				org_map[i][j] = Double.parseDouble(organics_col[j]);
     			}
     		}
     		//
-    		String[] bots = l[3].split(":");
+    		String[] co2 = l[3].split(":");
+    		for (int i = 0; i < co2.length; i++) {
+    			String[] co2_col = co2[i].split("'");
+    			for (int j = 0; j < co2_col.length; j++) {
+    				co2_map[i][j] = Double.parseDouble(co2_col[j]);
+    			}
+    		}
+    		//
+    		String[] bots = l[4].split(":");
     		for (int i = 0; i < bots.length; i++) {
     			String[] bot_data = bots[i].split("'");
     			Bot new_bot = new Bot(
     				Integer.parseInt(bot_data[2]),
     				Integer.parseInt(bot_data[3]),
     				new Color(Integer.parseInt(bot_data[9]), Integer.parseInt(bot_data[10]), Integer.parseInt(bot_data[11])),
-    				Integer.parseInt(bot_data[0]),
+    				Double.parseDouble(bot_data[0]),
     				0,
     				oxygen_map,
     				co2_map,
@@ -682,8 +690,9 @@ public class World extends JPanel{
         }
 	}
 	//
-	public void save_world() {
+	public void save_world() {//сохранить мир
 		try {
+			//сохранение кислорода
 			FileWriter fileWriter = new FileWriter("saved worlds/" + for_load.getText() + ".dat");
 	        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 			bufferedWriter.write(String.valueOf(steps) + ";");
@@ -693,6 +702,7 @@ public class World extends JPanel{
 				}
 				bufferedWriter.write(":");
 			}
+			//сохранение органики
 			bufferedWriter.write(";");
 			for (int x = 0; x < Constant.world_scale[0]; x++) {
 				for (int y = 0; y < Constant.world_scale[1]; y++) {
@@ -700,27 +710,36 @@ public class World extends JPanel{
 				}
 				bufferedWriter.write(":");
 			}
+			//сохранение углекислоты
 			bufferedWriter.write(";");
-			for(Bot b: objects) {//bot length - 82
-				bufferedWriter.write(String.valueOf(b.energy) + "'");//0
-				bufferedWriter.write(String.valueOf(b.age) + "'");//1
-				bufferedWriter.write(String.valueOf(b.xpos) + "'");//2
-				bufferedWriter.write(String.valueOf(b.ypos) + "'");//3
-				bufferedWriter.write(String.valueOf(b.rotate) + "'");//4
-				bufferedWriter.write(String.valueOf(b.state) + "'");//5
-				bufferedWriter.write(String.valueOf(b.c_red) + "'");//6
-				bufferedWriter.write(String.valueOf(b.c_green) + "'");//7
-				bufferedWriter.write(String.valueOf(b.c_blue) + "'");//8
-				bufferedWriter.write(String.valueOf(b.color.getRed()) + "'");//9
-				bufferedWriter.write(String.valueOf(b.color.getGreen()) + "'");//10
-				bufferedWriter.write(String.valueOf(b.color.getBlue()) + "'");//11
-				bufferedWriter.write(String.valueOf(b.clan_color.getRed()) + "'");//12
-				bufferedWriter.write(String.valueOf(b.clan_color.getGreen()) + "'");//13
-				bufferedWriter.write(String.valueOf(b.clan_color.getBlue()) + "'");//14
-				bufferedWriter.write(String.valueOf(b.index) + "'");//15
-				bufferedWriter.write(String.valueOf(b.pht_org_block) + "'");//16
-				bufferedWriter.write(String.valueOf(b.seed_time) + "'");//17
-				for (int i = 0; i < 64; i++) {//18 - 81
+			for (int x = 0; x < Constant.world_scale[0]; x++) {
+				for (int y = 0; y < Constant.world_scale[1]; y++) {
+					bufferedWriter.write(String.valueOf(co2_map[x][y]) + "'");
+				}
+				bufferedWriter.write(":");
+			}
+			//сохранение бота
+			bufferedWriter.write(";");
+			for(Bot b: objects) {//                                                   длина бота - 82
+				bufferedWriter.write(String.valueOf(b.energy) + "'");//               0 - энергия
+				bufferedWriter.write(String.valueOf(b.age) + "'");//                  1 - возраст
+				bufferedWriter.write(String.valueOf(b.xpos) + "'");//                 2 - позиция x
+				bufferedWriter.write(String.valueOf(b.ypos) + "'");//                 3 - позиция y
+				bufferedWriter.write(String.valueOf(b.rotate) + "'");//               4 - направление
+				bufferedWriter.write(String.valueOf(b.state) + "'");//                5 - состояние
+				bufferedWriter.write(String.valueOf(b.c_red) + "'");//                6 - красный в режиме отрисовки хищников
+				bufferedWriter.write(String.valueOf(b.c_green) + "'");//              7 - зеленый в режиме отрисовки хищников
+				bufferedWriter.write(String.valueOf(b.c_blue) + "'");//               8 - синий в режиме отрисовки хищников
+				bufferedWriter.write(String.valueOf(b.color.getRed()) + "'");//       9 - красный
+				bufferedWriter.write(String.valueOf(b.color.getGreen()) + "'");//     10 - зеленый
+				bufferedWriter.write(String.valueOf(b.color.getBlue()) + "'");//      11 - синий
+				bufferedWriter.write(String.valueOf(b.clan_color.getRed()) + "'");//  12 - красный(кланы)
+				bufferedWriter.write(String.valueOf(b.clan_color.getGreen()) + "'");//13 - зеленый(кланы)
+				bufferedWriter.write(String.valueOf(b.clan_color.getBlue()) + "'");// 14 - синий(кланы)
+				bufferedWriter.write(String.valueOf(b.index) + "'");//                15 - индекс генома
+				bufferedWriter.write(String.valueOf(b.pht_org_block) + "'");//        16 - специализация
+				bufferedWriter.write(String.valueOf(b.seed_time) + "'");//            17 - сколько еще лететь(если семечко)
+				for (int i = 0; i < 64; i++) {//                                      18 - 81 - геном
 					bufferedWriter.write(String.valueOf(b.commands[i]) + "'");
 				}
 				bufferedWriter.write(":");
