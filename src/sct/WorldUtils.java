@@ -41,7 +41,7 @@ public class WorldUtils {
 					for (int i = 0; i < 8; i++) {
 						int[] f = {x, y};
 						int[] pos = Constant.get_rotate_position(i, f);
-						if (pos[1] >= 0 && pos[1] < Constant.world_scale[1]) {
+						if (pos[1] >= 0 && pos[1] < Constant.world_scale[1] && org_map[pos[0]][pos[1]] < Constant.org_die_level) {
 							count++;
 						}
 					}
@@ -53,7 +53,7 @@ public class WorldUtils {
 					for (int i = 0; i < 8; i++) {
 						int[] f = {x, y};
 						int[] pos = Constant.get_rotate_position(i, f);
-						if (pos[1] >= 0 && pos[1] < Constant.world_scale[1]) {
+						if (pos[1] >= 0 && pos[1] < Constant.world_scale[1] && org_map[pos[0]][pos[1]] < Constant.org_die_level) {
 							new_map[pos[0]][pos[1]] += ox;
 							if (new_map[pos[0]][pos[1]] > 1) {
 								new_map[pos[0]][pos[1]] = 1;

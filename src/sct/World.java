@@ -367,7 +367,7 @@ public class World extends JPanel{
 	//
 	private class BotListener extends MouseAdapter implements ActionListener{
 		public void mousePressed(MouseEvent e) {
-			if (e.getX() <= Constant.world_scale[0] * Constant.size && e.getY() <= Constant.world_scale[1] * Constant.size) {
+			if (e.getX() < Constant.world_scale[0] * Constant.size && e.getY() < Constant.world_scale[1] * Constant.size) {
 				int[] botpos = new int[2];
 				int w = Constant.world_scale[0] * Constant.size / Constant.zoom_sizes[zoom];
 				int h = Constant.world_scale[1] * Constant.size / Constant.zoom_sizes[zoom];
@@ -391,7 +391,7 @@ public class World extends JPanel{
 		}
 		//
 		public void mouseDragged(MouseEvent e) {
-			if (e.getX() <= Constant.world_scale[0] * Constant.size && e.getY() <= Constant.world_scale[1] * Constant.size) {
+			if (e.getX() < Constant.world_scale[0] * Constant.size && e.getY() < Constant.world_scale[1] * Constant.size) {
 				int[] botpos = new int[2];
 				int w = Constant.world_scale[0] * Constant.size / Constant.zoom_sizes[zoom];
 				int h = Constant.world_scale[1] * Constant.size / Constant.zoom_sizes[zoom];
