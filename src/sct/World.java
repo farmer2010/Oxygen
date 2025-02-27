@@ -117,6 +117,11 @@ public class World extends JPanel{
         type_button.setBounds(Constant.W - 100, 215, 95, 20);
         add(type_button);
         //
+        JButton chain_button = new JButton("Chain");
+        chain_button.addActionListener(new change_draw_type(6));
+        chain_button.setBounds(Constant.W - 300, 240, 95, 20);
+        add(chain_button);
+        //
         //смена режимов отрисовки фона
         //
         JButton none_button = new JButton("None");
@@ -275,7 +280,7 @@ public class World extends JPanel{
 		canvas.setColor(black);//рисуем текст
 		canvas.setFont(new Font("arial", Font.BOLD, 18));
 		canvas.drawString("Main: ", Constant.W - 300, 20);
-		canvas.drawString("version 1.9", Constant.W - 300, 40);
+		canvas.drawString("version 4.1", Constant.W - 300, 40);
 		canvas.drawString("steps: " + String.valueOf(steps), Constant.W - 300, 60);
 		canvas.drawString("objects: " + String.valueOf(obj_count) + ", bots: " + String.valueOf(b_count), Constant.W - 300, 80);
 		canvas.drawString("render type: " + Constant.draw_type_names[draw_type] + " view", Constant.W - 300, 100);

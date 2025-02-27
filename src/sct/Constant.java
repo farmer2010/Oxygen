@@ -13,11 +13,11 @@ public class Constant {
 	public static int starting_org = 200;
 	public static double ox_render_maximum_coeff = 0.25;
 	public static double co2_render_maximum_coeff = 0.25;
-	public static String[] draw_type_names = {"predators", "energy", "color", "clans", "age", "types"};
+	public static String[] draw_type_names = {"predators", "energy", "color", "clans", "age", "types", "chains"};
 	public static String[] mouse_func_names = {"select", "set", "remove"};
 	public static int[] zoom_sizes = {2, 5, 10};
 	//
-	public static double org_recycle_ox_coeff = 0.00003;
+	public static double org_recycle_ox_coeff = 0.000027;
 	public static double life_ox_coeff = 0.002;
 	public static double move_ox_coeff = 0.003;
 	public static double attack_ox_coeff = 0.01;
@@ -28,10 +28,11 @@ public class Constant {
 	//
 	public static double life_co2_coeff = 0.001;
 	public static double pht_co2_coeff = 0.0003;
-	public static double org_recycle_co2_coeff = 0.0002;
+	public static double org_recycle_co2_coeff = 0.0001;
+	public static double die_co2_coeff = 0.0003;
 	//
 	public static double org_die_level = 800.0;
-	public static int age_minus_coeff = 10;
+	public static int age_minus_coeff = 20;
 	public static int energy_for_life = 1;
 	public static int energy_for_move = 1;
 	public static int energy_for_multiply = 50;

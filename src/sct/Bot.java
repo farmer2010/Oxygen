@@ -25,6 +25,7 @@ public class Bot{
 	public int[] commands = new int[64];
 	public int index = 0;
 	public int rotate = rand.nextInt(8);
+	private boolean[] chain = new boolean[8];
 	//
 	public int c_red = -1;//цвет в режиме отрисовки хищников
 	public int c_green = -1;
@@ -90,18 +91,16 @@ public class Bot{
 					co2_map[xpos][ypos] += Constant.life_co2_coeff * count;
 					update_commands(iterator);//если хватило кислорода, выполняем команды
 					if (energy >= Constant.energy_for_auto_multiply) {//автоматическое деление
-						multiply(rotate, 0, 0, 0, iterator);
+						multiply(rotate, 0, 0, 0, false, iterator);
 					}
 				}
+				update_chain();//обновление цепочек
 				//
-				if (energy <= 0) {//смерть от недостатка энергии
-					die_with_organics();
-					return(0);
-				}else if (energy > 1000) {//ограничитель
+				if (energy > 1000) {//ограничитель количества энергии
 					energy = 1000;
 				}
 				//
-				if (age <= 0 || org_map[xpos][ypos] >= Constant.org_die_level) {//смерть от старости или от органики
+				if (age <= 0 || org_map[xpos][ypos] >= Constant.org_die_level || energy <= 0) {//смерть от старости или от органики
 					die_with_organics();
 					return(0);
 				}
@@ -161,7 +160,7 @@ public class Bot{
 				break;
 			}else if (command == 5) {//походить относительно
 				int count = bot_count() + 1;
-				if (count_oxygen() >= Constant.move_ox_coeff * count) {
+				if (count_oxygen() >= Constant.move_ox_coeff * count && count_chains() == 0) {
 					oxygen_map[xpos][ypos] -= Constant.move_ox_coeff * count;
 					int sens = move(commands[(index + 1) % 64] % 8);
 					if (sens == 1) {
@@ -173,7 +172,7 @@ public class Bot{
 				break;
 			}else if(command == 6) {//походить абсолютно
 				int count = bot_count() + 1;
-				if (count_oxygen() >= Constant.move_ox_coeff * count) {
+				if (count_oxygen() >= Constant.move_ox_coeff * count && count_chains() == 0) {
 					oxygen_map[xpos][ypos] -= Constant.move_ox_coeff * count;
 					move(rotate);
 					energy -= Constant.energy_for_move;
@@ -237,13 +236,13 @@ public class Bot{
 				}
 			}else if (command == 18) {//поделиться относительно
 				int new_type = commands[(index + 2) % 64] % 8;
-				multiply(commands[(index + 1) % 64] % 8, 0, 0, new_type, iterator);
+				multiply(commands[(index + 1) % 64] % 8, 0, 0, new_type, false, iterator);
 				index += 3;
 				index %= 64;
 				break;
 			}else if (command == 19) {//поделиться абсолютно
 				int new_type = commands[(index + 1) % 64] % 8;
-				multiply(rotate, 0, 0, new_type, iterator);
+				multiply(rotate, 0, 0, new_type, false, iterator);
 				index += 2;
 				index %= 64;
 				break;
@@ -352,19 +351,51 @@ public class Bot{
 				int rot = commands[(index + 1) % 64] % 8;
 				int time = commands[(index + 2) % 64] % 16 + 1;
 				int new_type = commands[(index + 3) % 64] % 8;
-				multiply(rot, 1, time, new_type, iterator);
+				multiply(rot, 1, time, new_type, false, iterator);
 				index += 4;
 				index %= 64;
 				break;
 			}else if (command == 40) {//стрелять семечком абсолютно
 				int time = commands[(index + 1) % 64] % 16 + 1;
 				int new_type = commands[(index + 2) % 64] % 8;
-				multiply(rotate, 1, time, new_type, iterator);
+				multiply(rotate, 1, time, new_type, false, iterator);
 				index += 3;
 				index %= 64;
 				break;
 			}else if (command == 41) {//какой у меня тип
 				index = commands[(index + 1 + type) % 64];
+			}else if (command == 42) {//добавление в цепочку относительно
+				int new_type = commands[(index + 2) % 64] % 8;
+				multiply(commands[(index + 1) % 64] % 8, 0, 0, new_type, true, iterator);
+				index += 3;
+				index %= 64;
+				break;
+			}else if (command == 43) {//добавление в цепочку абсолютно
+				int new_type = commands[(index + 1) % 64] % 8;
+				multiply(rotate, 0, 0, new_type, true, iterator);
+				index += 2;
+				index %= 64;
+				break;
+			}else if (command == 44) {//сколько у меня связей в цепочке
+				int c = count_chains();
+				int ind = commands[(index + 1) % 64] % 8;
+				if (c > ind) {//
+					index = commands[(index + 2) % 64];
+				}else if (c < ind) {//
+					index = commands[(index + 3) % 64];
+				}else {//
+					index = commands[(index + 4) % 64];
+				}
+			}else if (command == 45) {//присоеденить соседа к цепочке относительно
+				add_neighbour_to_chain(commands[(index + 1) % 64] % 8);
+				index += 2;
+				index %= 64;
+				break;
+			}else if (command == 46) {//присоеденить соседа к цепочке абсолютно
+				add_neighbour_to_chain(rotate);
+				index += 1;
+				index %= 64;
+				break;
 			}else {
 				index += command;
 				index %= 64;
@@ -373,6 +404,16 @@ public class Bot{
 	}
 	//
 	//КОМАНДЫ
+	//
+	public void add_neighbour_to_chain(int rot) {
+		int[] pos = get_rotate_position(rot);
+		if (pos[1] >= 0 & pos[1] < Constant.world_scale[1]) {
+			if (map[pos[0]][pos[1]] != null && map[pos[0]][pos[1]].state == 0) {
+				chain[rot] = true;
+				map[pos[0]][pos[1]].chain[(rot + 4) % 8] = true;
+			}
+		}
+	}
 	//
 	public int move(int rot) {
 		int[] pos = get_rotate_position(rot);
@@ -457,6 +498,7 @@ public class Bot{
 			if (org_map[pos[0]][pos[1]] > org) {
 				if (ox >= org * Constant.org_recycle_ox_coeff) {
 					oxygen_map[xpos][ypos] -= org * Constant.org_recycle_ox_coeff;
+					co2_map[xpos][ypos] += org * Constant.org_recycle_co2_coeff;
 					energy += org;
 					org_map[pos[0]][pos[1]] -= org;
 					go_yellow();
@@ -464,6 +506,7 @@ public class Bot{
 			}else {
 				if (ox >= org_map[pos[0]][pos[1]] * Constant.org_recycle_ox_coeff) {
 					oxygen_map[xpos][ypos] -= org_map[pos[0]][pos[1]] * Constant.org_recycle_ox_coeff;
+					co2_map[xpos][ypos] += org_map[pos[0]][pos[1]] * Constant.org_recycle_co2_coeff;
 					energy += org_map[pos[0]][pos[1]];
 					if (org_map[pos[0]][pos[1]] != 0) {
 						go_yellow();
@@ -481,6 +524,7 @@ public class Bot{
 			if (org_map[pos[0]][pos[1]] > org) {
 				if (ox >= org * Constant.org_recycle_ox_coeff) {
 					oxygen_map[xpos][ypos] -= org * Constant.org_recycle_ox_coeff;
+					co2_map[xpos][ypos] += org * Constant.org_recycle_co2_coeff;
 					energy += org;
 					org_map[pos[0]][pos[1]] -= org;
 					go_yellow();
@@ -488,6 +532,7 @@ public class Bot{
 			}else {
 				if (ox >= org_map[pos[0]][pos[1]] * Constant.org_recycle_ox_coeff) {
 					oxygen_map[xpos][ypos] -= org_map[pos[0]][pos[1]] * Constant.org_recycle_ox_coeff;
+					co2_map[xpos][ypos] += org_map[pos[0]][pos[1]] * Constant.org_recycle_co2_coeff;
 					energy += org_map[pos[0]][pos[1]];
 					if (org_map[pos[0]][pos[1]] > 0) {
 						go_yellow();
@@ -511,7 +556,7 @@ public class Bot{
 		}
 	}
 	//
-	public void multiply(int rot, int seed, int time, int new_type, ListIterator<Bot> iterator) {
+	public void multiply(int rot, int seed, int time, int new_type, boolean ch, ListIterator<Bot> iterator) {
 		int[] pos = get_rotate_position(rot);
 		if (pos[1] >= 0 & pos[1] < Constant.world_scale[1]) {
 			if (map[pos[0]][pos[1]] == null) {
@@ -552,6 +597,9 @@ public class Bot{
 						new_bot.state = 1;
 						new_bot.seed_time = time;
 						new_bot.rotate = rot;
+					}else if (ch) {
+						chain[rot] = true;
+						new_bot.chain[(rot + 4) % 8] = true;
 					}
 					//
 					iterator.add(new_bot);
@@ -607,10 +655,12 @@ public class Bot{
 			}
 		}
 		org_map[xpos][ypos] += enr;
+		co2_map[xpos][ypos] += Constant.die_co2_coeff * enr;
 		oxygen_map[xpos][ypos] -= Constant.die_ox_coeff;
 		if (oxygen_map[xpos][ypos] < 0) {
 			oxygen_map[xpos][ypos] = 0;
 		}
+		delete_chain();
 	}
 	//
 	public int[] get_rotate_position(int rot){
@@ -660,6 +710,17 @@ public class Bot{
 					c = new Color(128, 128, 128);
 				}else if (type == 7) {
 					c = new Color(0, 128, 255);
+				}
+			}else if (draw_type == 6) {
+				int count_ch = count_chains();
+				if (count_ch == 0) {
+					c = new Color(255, 255, 128);
+				}else if (count_ch == 1){
+					c = new Color(85, 0, 85);
+				}else if (count_ch == 2) {
+					c = new Color(200, 0, 200);
+				}else {
+					c = new Color(255, 0, 255);
 				}
 			}
 		}else if (state == 1){//рисуем семечко
@@ -714,5 +775,58 @@ public class Bot{
 			c_green = Constant.border(c_green + 3, 255, 0);
 			c_blue = Constant.border(c_blue - 3, 255, 0);
 		}
+	}
+	//
+	public void update_chain() {
+		int c = 1;
+		double energy_sum = energy;
+		for (int i = 0; i < 8; i++) {
+			if (chain[i]) {
+				int[] pos = get_rotate_position(i);
+				if (pos[1] >= 0 & pos[1] < Constant.world_scale[1]) {
+					if (map[pos[0]][pos[1]] != null && map[pos[0]][pos[1]].state == 0) {
+						energy_sum += map[pos[0]][pos[1]].energy;
+						c++;
+					}else {
+						chain[i] = false;
+					}
+				}
+			}
+		}
+		if (c != 1) {
+			double enr = energy_sum / c;
+			energy = enr;
+			for (int i = 0; i < 8; i++) {
+				if (chain[i]) {
+					int[] pos = get_rotate_position(i);
+					if (pos[1] >= 0 & pos[1] < Constant.world_scale[1]) {
+						map[pos[0]][pos[1]].energy = enr;
+					}
+				}
+			}
+		}
+	}
+	//
+	public void delete_chain() {
+		for (int g = 0; g < 8; g++) {
+			if (chain[g]) {
+				int[] pos = get_rotate_position(g);
+				if (pos[1] >= 0 & pos[1] < Constant.world_scale[1]) {
+					if (map[pos[0]][pos[1]] != null && map[pos[0]][pos[1]].state == 0) {
+						map[pos[0]][pos[1]].chain[(g + 4) % 8] = false;
+					}
+				}
+			}
+		}
+	}
+	//
+	public int count_chains() {
+		int sum = 0;
+		for (int i = 0; i < 8; i++) {
+			if (chain[i]){
+				sum++;
+			}
+		}
+		return(sum);
 	}
 }
