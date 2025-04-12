@@ -9,7 +9,7 @@ public class Main{
 		new File("record/energy").mkdirs();
 		new File("record/color").mkdirs();
 		new File("record/predators-org").mkdirs();
-		//new File("record/predators-co2").mkdirs();
+		new File("record/predators-co2").mkdirs();
 		//
 		new File("saved worlds").mkdirs();
 		//

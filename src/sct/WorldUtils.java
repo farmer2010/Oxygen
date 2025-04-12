@@ -37,28 +37,26 @@ public class WorldUtils {
 			for (int y = 0; y < Constant.world_scale[1]; y++) {
 				if (gas_map[x][y] >= Constant.ox_distribution_min) {
 					gas_map[x][y] *= Constant.evaporation_ox_coeff;//испарение
-					int count = 1;
-					for (int i = 0; i < 8; i++) {
-						int[] f = {x, y};
-						int[] pos = Constant.get_rotate_position(i, f);
-						if (pos[1] >= 0 && pos[1] < Constant.world_scale[1] && org_map[pos[0]][pos[1]] < Constant.org_die_level) {
-							count++;
-						}
-					}
-					double ox = gas_map[x][y] / count;
+					double ox = gas_map[x][y] / 9;
 					new_map[x][y] += ox;
-					if (new_map[x][y] > 1) {
-						new_map[x][y] = 1;
-					}
+					int count = 0;
 					for (int i = 0; i < 8; i++) {
 						int[] f = {x, y};
 						int[] pos = Constant.get_rotate_position(i, f);
-						if (pos[1] >= 0 && pos[1] < Constant.world_scale[1] && org_map[pos[0]][pos[1]] < Constant.org_die_level) {
+						if (pos[1] >= 0 && pos[1] < Constant.world_scale[1]) {
 							new_map[pos[0]][pos[1]] += ox;
 							if (new_map[pos[0]][pos[1]] > 1) {
 								new_map[pos[0]][pos[1]] = 1;
 							}
+						}else {
+							count++;
 						}
+					}
+					for (int i = 0; i < count; i++) {
+						new_map[x][y] += ox;
+					}
+					if (new_map[x][y] > 1) {
+						new_map[x][y] = 1;
 					}
 				}else {
 					new_map[x][y] += gas_map[x][y];

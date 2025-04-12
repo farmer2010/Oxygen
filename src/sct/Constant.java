@@ -6,30 +6,30 @@ public class Constant {
 	public static int W = 1920;
 	public static int H = 1080;
 	public static int size = 2;
-	public static int[] world_scale = {500, 500};
+	public static int[] world_scale = {810, 540};
 	public static int starting_bot_count = 45000;
 	public static double starting_ox = 0.02;
 	public static double starting_co2 = 0.02;
 	public static int starting_org = 200;
-	public static double ox_render_maximum_coeff = 0.25;
-	public static double co2_render_maximum_coeff = 0.25;
+	public static double ox_render_maximum_coeff = 0.0625;
+	public static double co2_render_maximum_coeff = 0.0625;
 	public static String[] draw_type_names = {"predators", "energy", "color", "clans", "age", "types", "chains"};
 	public static String[] mouse_func_names = {"select", "set", "remove"};
 	public static int[] zoom_sizes = {2, 5, 10};
 	//
-	public static double org_recycle_ox_coeff = 0.000027;
+	public static double org_recycle_ox_coeff = 0.00003;
 	public static double life_ox_coeff = 0.002;
 	public static double move_ox_coeff = 0.003;
 	public static double attack_ox_coeff = 0.01;
-	public static double pht_ox_coeff = 0.003;
+	public static double pht_ox_coeff = 0.004;
 	public static double die_ox_coeff = 0.01;
 	public static double evaporation_ox_coeff = 0.98;
 	public static double ox_distribution_min = 0.001;
 	//
-	public static double life_co2_coeff = 0.001;
+	public static double life_co2_coeff = 0.0004;
 	public static double pht_co2_coeff = 0.0003;
 	public static double org_recycle_co2_coeff = 0.0001;
-	public static double die_co2_coeff = 0.0003;
+	public static double die_co2_coeff = 0.0005;
 	//
 	public static double org_die_level = 800.0;
 	public static int age_minus_coeff = 20;
@@ -41,8 +41,8 @@ public class Constant {
 	//
 	public static double pht_coeff = 400;
 	public static int[] pht_energy_list = {12, 11, 10, 9, 8, 7, 6, 5};
-	public static double pht_neighbours_coeff = 0.1111;
-	public static double org_recycle_coeff = 1;
+	public static double[] pht_neighbours_coeff = {1, 0.8, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0};
+	public static double org_recycle_coeff = 0.5;
 	//
 	public static int[][] movelist = {
 		{0, -1},

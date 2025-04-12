@@ -16,7 +16,7 @@ public class Draw {
 					if (ox > Constant.ox_render_maximum_coeff) {
 						ox = Constant.ox_render_maximum_coeff;
 					}
-					canvas.setColor(Constant.gradient(new Color(255, 255, 255), new Color(128, 128, 255), ox * (1 / Constant.ox_render_maximum_coeff)));
+					canvas.setColor(Constant.gradient(new Color(255, 255, 255), new Color(112, 219, 235), ox * (1 / Constant.ox_render_maximum_coeff)));
 					canvas.fillRect(x * Constant.size, y * Constant.size, Constant.size, Constant.size);
 					if (org_map[x][y] >= Constant.org_die_level) {
 						canvas.setColor(new Color(90, 0, 0));
@@ -29,7 +29,7 @@ public class Draw {
 					if (ox > Constant.ox_render_maximum_coeff) {
 						ox = Constant.ox_render_maximum_coeff;
 					}
-					canvas.setColor(Constant.gradient(new Color(255, 255, 255), new Color(128, 128, 255), ox * (1 / Constant.ox_render_maximum_coeff)));
+					canvas.setColor(Constant.gradient(new Color(255, 255, 255), new Color(112, 219, 235), ox * (1 / Constant.ox_render_maximum_coeff)));
 					canvas.fillRect(i * Constant.zoom_sizes[zoom], j * Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom]);
 					if (org_map[x][y] >= Constant.org_die_level) {
 						canvas.setColor(new Color(90, 0, 0));
@@ -74,7 +74,7 @@ public class Draw {
 					if (co2 > Constant.co2_render_maximum_coeff) {
 						co2 = Constant.co2_render_maximum_coeff;
 					}
-					canvas.setColor(Constant.gradient(new Color(255, 255, 255), new Color(255, 128, 128), co2 * (1 / Constant.co2_render_maximum_coeff)));
+					canvas.setColor(Constant.gradient(new Color(255, 255, 255), new Color(38, 36, 235), co2 * (1 / Constant.co2_render_maximum_coeff)));
 					canvas.fillRect(x * Constant.size, y * Constant.size, Constant.size, Constant.size);
 					if (org_map[x][y] >= Constant.org_die_level) {
 						canvas.setColor(new Color(90, 0, 0));
@@ -87,7 +87,7 @@ public class Draw {
 					if (co2 > Constant.co2_render_maximum_coeff) {
 						co2 = Constant.co2_render_maximum_coeff;
 					}
-					canvas.setColor(Constant.gradient(new Color(255, 255, 255), new Color(128, 255, 128), co2 * (1 / Constant.co2_render_maximum_coeff)));
+					canvas.setColor(Constant.gradient(new Color(255, 255, 255), new Color(38, 36, 235), co2 * (1 / Constant.co2_render_maximum_coeff)));
 					canvas.fillRect(i * Constant.zoom_sizes[zoom], j * Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom], Constant.zoom_sizes[zoom]);
 					if (org_map[x][y] >= Constant.org_die_level) {
 						canvas.setColor(new Color(90, 0, 0));
