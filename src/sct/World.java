@@ -320,14 +320,14 @@ public class World extends JPanel{
 		//
 		if (sh_brain) {//рисуем мозг
 			canvas.setColor(new Color(90, 90, 90));
-			canvas.fillRect(0, 0, 360, 360);
+			canvas.fillRect(0, 0, 720, 720);
 			canvas.setColor(new Color(128, 128, 128));
-			for (int x = 0; x < 8; x++) {
-				for (int y = 0; y < 8; y++) {
+			for (int x = 0; x < 16; x++) {
+				for (int y = 0; y < 16; y++) {
 					canvas.setColor(new Color(128, 128, 128));
 					canvas.fillRect(x * 45, y * 45, 40, 40);
 					canvas.setColor(new Color(0, 0, 0));
-					canvas.drawString(String.valueOf(selection.commands[x + y * 8]), x * 45 + 20, y * 45 + 20);
+					canvas.drawString(String.valueOf(selection.commands[x + y * 8]), x * 45, y * 45 + 20);
 				}
 			}
 		}
@@ -337,21 +337,23 @@ public class World extends JPanel{
 	//
 	public void record() {
 		//отрисовка
-		BufferedImage[] buff = new BufferedImage[4];
-		for (int i = 0; i < 4; i++) {
-			buff[i] = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
+		BufferedImage[] buff = new BufferedImage[5];
+		for (int i = 0; i < 5; i++) {
+			buff[i] = new BufferedImage(1620, 1080, BufferedImage.TYPE_INT_RGB);
 			Graphics2D g2d = buff[i].createGraphics();
 			g2d.setColor(Color.WHITE);
-			g2d.fillRect(0, 0, 1000, 1000);
-			if (i != 1) {
+			g2d.fillRect(0, 0, 1620, 1080);
+			if (i != 1 && i != 2) {
 				Draw.draw_ox(g2d, oxygen_map, org_map, zoom, zoom_disp_pos);
-			}else {
+			}else if (i == 1){
 				Draw.draw_org(g2d, org_map, zoom, zoom_disp_pos);
+			}else {
+				Draw.draw_co2(g2d, co2_map, org_map, zoom, zoom_disp_pos);
 			}
 			for(Bot b: objects) {
 				int dt = 0;
-				if (i > 1) {
-					dt = i - 1;
+				if (i > 2) {
+					dt = i - 2;
 				}
 				b.Draw(g2d, dt, 0, zoom_disp_pos);
 			}
@@ -359,10 +361,11 @@ public class World extends JPanel{
 		}
 		//сохранение
 		try {
-			ImageIO.write(buff[0], "png", new File("record/predators-oxygen/screen" + String.valueOf(steps / 25)+ ".png"));
-			ImageIO.write(buff[1], "png", new File("record/predators-org/screen" + String.valueOf(steps / 25)+ ".png"));
-			ImageIO.write(buff[2], "png", new File("record/color/screen" + String.valueOf(steps / 25)+ ".png"));
-			ImageIO.write(buff[3], "png", new File("record/energy/screen" + String.valueOf(steps / 25)+ ".png"));
+			ImageIO.write(buff[0], "png", new File("record/predators-oxygen/screen" + String.valueOf(steps / 25) + ".png"));
+			ImageIO.write(buff[1], "png", new File("record/predators-org/screen" + String.valueOf(steps / 25) + ".png"));
+			ImageIO.write(buff[2], "png", new File("record/predators-co2/screen" + String.valueOf(steps / 25) + ".png"));
+			ImageIO.write(buff[3], "png", new File("record/color/screen" + String.valueOf(steps / 25) + ".png"));
+			ImageIO.write(buff[4], "png", new File("record/energy/screen" + String.valueOf(steps / 25) + ".png"));
 		}catch (IOException e) {
 			e.printStackTrace();
 		}

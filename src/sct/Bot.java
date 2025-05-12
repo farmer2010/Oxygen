@@ -25,7 +25,7 @@ public class Bot{
 	public int age = Constant.max_age;
 	public int memory = 0;
 	public int type;
-	public int[] commands = new int[64];
+	public int[] commands = new int[256];
 	public int index = 0;
 	public int rotate = rand.nextInt(8);
 	public boolean[] chain = new boolean[8];
@@ -53,8 +53,8 @@ public class Bot{
 		org_map = new_org_map;
 		type = new_type;
 		//
-		for (int i = 0; i < 64; i++) {//заполняем мозг случайными числами
-			commands[i] = rand.nextInt(64);
+		for (int i = 0; i < 256; i++) {//заполняем мозг случайными числами
+			commands[i] = rand.nextInt(256);
 		}
 	}
 	public void Draw(Graphics canvas, int draw_type, int zoom, int[] pos) {
@@ -164,16 +164,16 @@ public class Bot{
 	//
 	public void update_commands(ListIterator<Bot> iterator) {//мозг
 		for (int i = 0; i < 5; i++) {
-			int command = commands[index];
+			int command = commands[index] % 64;
 			if (command == 0) {//повернуться
-				rotate += commands[(index + 1) % 64] % 8;
+				rotate += commands[(index + 1) % 256] % 8;
 				rotate %= 8;
 				index += 2;
-				index %= 64;
+				index %= 256;
 			}else if (command == 1) {//сменить направление
-				rotate = commands[(index + 1) % 64] % 8;
+				rotate = commands[(index + 1) % 256] % 8;
 				index += 2;
-				index %= 64;
+				index %= 256;
 			}else if (command == 2 || command == 3 || command == 4) {//фотосинтез
 				int sector = Constant.sector(ypos);
 				if (sector <= 7 && pht_org_block != 2 && BotUtils.count_co2(this) >= Constant.pht_co2_coeff) {
@@ -187,19 +187,19 @@ public class Bot{
 					co2_map[xpos][ypos] -= Constant.pht_co2_coeff;
 				}
 				index += 1;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 5) {//походить относительно
 				int count = BotUtils.bot_count(this) + 1;
 				if (BotUtils.count_oxygen(this) >= Constant.move_ox_coeff * count && BotUtils.count_chains(this) == 0) {
 					oxygen_map[xpos][ypos] -= Constant.move_ox_coeff * count;
-					int sens = BotCommands.move(this, commands[(index + 1) % 64] % 8);
+					int sens = BotCommands.move(this, commands[(index + 1) % 256] % 8);
 					if (sens == 1) {
 						energy -= Constant.energy_for_move;
 					}
 				}
 				index += 2;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if(command == 6) {//походить абсолютно
 				int count = BotUtils.bot_count(this) + 1;
@@ -209,16 +209,16 @@ public class Bot{
 					energy -= Constant.energy_for_move;
 				}
 				index += 1;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 7) {//атаковать относительно
 				int count = BotUtils.bot_count(this) + 1;
 				if (BotUtils.count_oxygen(this) >= Constant.attack_ox_coeff * count) {
 					oxygen_map[xpos][ypos] -= Constant.attack_ox_coeff * count;
-					BotCommands.attack(this, commands[(index + 1) % 64] % 8);
+					BotCommands.attack(this, commands[(index + 1) % 256] % 8);
 				}
 				index += 2;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 8) {//атаковать абсолютно
 				int count = BotUtils.bot_count(this) + 1;
@@ -227,156 +227,156 @@ public class Bot{
 					BotCommands.attack(this, rotate);
 				}
 				index += 1;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 9) {//посмотреть относительно
-				int rot = commands[(index + 1) % 64] % 8;
-				index = commands[(index + 2 + BotCommands.see(this, rot)) % 64];
+				int rot = commands[(index + 1) % 256] % 8;
+				index = commands[(index + 2 + BotCommands.see(this, rot)) % 256];
 			}else if (command == 10) {//посмотреть абсолютно
-				index = commands[(index + 1 + BotCommands.see(this, rotate)) % 64];
+				index = commands[(index + 1 + BotCommands.see(this, rotate)) % 256];
 			}else if (command == 11 | command == 12) {//отдать ресурсы относительно
-				BotCommands.give(this, commands[(index + 1) % 64] % 8);
+				BotCommands.give(this, commands[(index + 1) % 256] % 8);
 				index += 2;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 13 | command == 14) {//отдать ресурсы абсолютно
 				BotCommands.give(this, rotate);
 				index += 1;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 15) {//сколько у меня энергии
-				int ind = commands[(index + 1) % 64] * 15;
+				int ind = commands[(index + 1) % 256] * 4;
 				if (energy >= ind) {
-					index = commands[(index + 2) % 64];
+					index = commands[(index + 2) % 256];
 				}else {
-					index = commands[(index + 3) % 64];
+					index = commands[(index + 3) % 256];
 				}
 			}else if (command == 16) {//есть ли фотосинтез
 				int sector = Constant.sector(ypos);
 				if (sector <= 5) {
-					index = commands[(index + 1) % 64];
+					index = commands[(index + 1) % 256];
 				}else {
-					index = commands[(index + 2) % 64];
+					index = commands[(index + 2) % 256];
 				}
 			}else if (command == 17) {//есть ли приход минералов
 				int sector = Constant.sector(ypos);
 				if (sector <= 7 & sector >= 5) {
-					index = commands[(index + 1) % 64];
+					index = commands[(index + 1) % 256];
 				}else {
-					index = commands[(index + 2) % 64];
+					index = commands[(index + 2) % 256];
 				}
 			}else if (command == 18) {//поделиться относительно
-				int new_type = commands[(index + 2) % 64] % 8;
-				BotCommands.multiply(this, commands[(index + 1) % 64] % 8, 0, 0, new_type, false, iterator);
+				int new_type = commands[(index + 2) % 256] % 8;
+				BotCommands.multiply(this, commands[(index + 1) % 256] % 8, 0, 0, new_type, false, iterator);
 				index += 3;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 19) {//поделиться абсолютно
-				int new_type = commands[(index + 1) % 64] % 8;
+				int new_type = commands[(index + 1) % 256] % 8;
 				BotCommands.multiply(this, rotate, 0, 0, new_type, false, iterator);
 				index += 2;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 20) {//какая моя позиция x
-				double ind = commands[(index + 1) % 64] / 64.0;
+				double ind = commands[(index + 1) % 256] / 256.0;
 				if (xpos * 1.0 / Constant.world_scale[0] >= ind) {
-					index = commands[(index + 2) % 64];
+					index = commands[(index + 2) % 256];
 				}else {
-					index = commands[(index + 3) % 64];
+					index = commands[(index + 3) % 256];
 				}
 			}else if (command == 21) {//какая моя позиция y
-				double ind = commands[(index + 1) % 64] / 64.0;
+				double ind = commands[(index + 1) % 256] / 256.0;
 				if (ypos * 1.0 / Constant.world_scale[1] >= ind) {
-					index = commands[(index + 2) % 64];
+					index = commands[(index + 2) % 256];
 				}else {
-					index = commands[(index + 3) % 64];
+					index = commands[(index + 3) % 256];
 				}
 			}else if (command == 22) {//какой мой возраст
-				int ind = commands[(index + 1) % 64] * 15;
+				int ind = commands[(index + 1) % 256] * 4;
 				if (age >= ind) {
-					index = commands[(index + 2) % 64];
+					index = commands[(index + 2) % 256];
 				}else {
-					index = commands[(index + 3) % 64];
+					index = commands[(index + 3) % 256];
 				}
 			}else if (command == 23) {//равномерное распределение ресурсов относительно
-				BotCommands.unif_distrib(this, commands[(index + 1) % 64] % 8);
+				BotCommands.unif_distrib(this, commands[(index + 1) % 256] % 8);
 				index += 2;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 24) {//равномерное распределение ресурсов абсолютно
 				BotCommands.unif_distrib(this, rotate);
 				index += 1;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 25) {//безусловный переход
-				index = commands[(index + 1) % 64];
+				index = commands[(index + 1) % 256];
 			}else if (command == 26) {//сколько кислорода
-				int ind = commands[(index + 1) % 64] / 63;
+				double ind = commands[(index + 1) % 256] / 255.0;
 				if (oxygen_map[xpos][ypos] >= ind) {
-					index = commands[(index + 2) % 64];
+					index = commands[(index + 2) % 256];
 				}else {
-					index = commands[(index + 3) % 64];
+					index = commands[(index + 3) % 256];
 				}
-			}else if (command == 27 || command == 28) {//переработка органики под собой
+			}else if (command == 27 || command == 28 || command == 47 || command == 50) {//переработка органики под собой
 				if (pht_org_block != 1) {
 					pht_org_block = 2;
-					BotCommands.recycle_organics_under(this, (int)(commands[(index + 1) % 64] * Constant.org_recycle_coeff));
+					BotCommands.recycle_organics_under(this, (int)(commands[(index + 1) % 256] * Constant.org_recycle_coeff));
 				}
 				index += 2;
-				index %= 64;
+				index %= 256;
 				break;
-			}else if (command == 29 || command == 30) {//переработка органики перед собой относительно
+			}else if (command == 29 || command == 30 || command == 48 || command == 51) {//переработка органики перед собой относительно
 				if (pht_org_block != 1) {
 					pht_org_block = 2;
-					BotCommands.recycle_organics(this, commands[(index + 1) % 64] % 8, (int)(commands[(index + 2) % 64] * Constant.org_recycle_coeff));
+					BotCommands.recycle_organics(this, commands[(index + 1) % 256] % 8, (int)(commands[(index + 2) % 256] * Constant.org_recycle_coeff));
 				}
 				index += 3;
-				index %= 64;
+				index %= 256;
 				break;
-			}else if (command == 31 || command == 32 || command == 47) {//переработка органики перед собой абсолютно
+			}else if (command == 31 || command == 32 || command == 49 || command == 52) {//переработка органики перед собой абсолютно
 				if (pht_org_block != 1) {
 					pht_org_block = 2;
-					BotCommands.recycle_organics(this, rotate, (int)(commands[(index + 2) % 64] * Constant.org_recycle_coeff));
+					BotCommands.recycle_organics(this, rotate, (int)(commands[(index + 2) % 256] * Constant.org_recycle_coeff));
 				}
 				index += 2;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 33) {//сколько органики подо мной
-				int ind = commands[(index + 1) % 64];
-				if (org_map[xpos][ypos] >= ind * 15) {
-					index = commands[(index + 2) % 64];
+				int ind = commands[(index + 1) % 256];
+				if (org_map[xpos][ypos] >= ind * 4) {
+					index = commands[(index + 2) % 256];
 				}else {
-					index = commands[(index + 3) % 64];
+					index = commands[(index + 3) % 256];
 				}
 			}else if (command == 34) {//сколько органики передо мной относительно
-				int rot = commands[(index + 1) % 64] % 8;
-				int ind = commands[(index + 2) % 64];
-				index = commands[(index + 3 + BotCommands.see_org(this, rot, ind)) % 64];
+				int rot = commands[(index + 1) % 256] % 8;
+				int ind = commands[(index + 2) % 256];
+				index = commands[(index + 3 + BotCommands.see_org(this, rot, ind)) % 256];
 			}else if (command == 35) {//сколько органики передо мной абсолютно
-				int ind = commands[(index + 1) % 64];
-				index = commands[(index + 2 + BotCommands.see_org(this, rotate, ind)) % 64];
+				int ind = commands[(index + 1) % 256];
+				index = commands[(index + 2 + BotCommands.see_org(this, rotate, ind)) % 256];
 			}else if (command == 36) {//какое мое направление
-				int ind = commands[(index + 1) % 64] % 8;
+				int ind = commands[(index + 1) % 256] % 8;
 				if (rotate >= ind) {
-					index = commands[(index + 2) % 64];
+					index = commands[(index + 2) % 256];
 				}else if (rotate == ind) {
-					index = commands[(index + 3) % 64];
+					index = commands[(index + 3) % 256];
 				}else {
-					index = commands[(index + 4) % 64];
+					index = commands[(index + 4) % 256];
 				}
 			}else if (command == 37) {//установить направление в случайное
 				rotate = rand.nextInt(8);
 				index += 1;
-				index %= 64;
+				index %= 256;
 			}else if (command == 38) {//сколько ботов вокруг
-				int ind = commands[(index + 1) % 64] % 8;
+				int ind = commands[(index + 1) % 256] % 8;
 				int count = BotUtils.bot_count(this);
 				if (count >= ind) {
-					index = commands[(index + 2) % 64];
+					index = commands[(index + 2) % 256];
 				}else if (count == ind) {
-					index = commands[(index + 3) % 64];
+					index = commands[(index + 3) % 256];
 				}else {
-					index = commands[(index + 4) % 64];
+					index = commands[(index + 4) % 256];
 				}
 			}else if (command == 39) {//стрелять семечком относительно
 				int rot = commands[(index + 1) % 64] % 8;
@@ -387,49 +387,49 @@ public class Bot{
 				index %= 64;
 				break;
 			}else if (command == 40) {//стрелять семечком абсолютно
-				int time = commands[(index + 1) % 64] % 16 + 1;
-				int new_type = commands[(index + 2) % 64] % 8;
+				int time = commands[(index + 1) % 256] % 16 + 1;
+				int new_type = commands[(index + 2) % 256] % 8;
 				BotCommands.multiply(this, rotate, 1, time, new_type, false, iterator);
 				index += 3;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 41) {//какой у меня тип
-				index = commands[(index + 1 + type) % 64];
+				index = commands[(index + 1 + type) % 256];
 			}else if (command == 42) {//добавление в цепочку относительно
-				int new_type = commands[(index + 2) % 64] % 8;
-				BotCommands.multiply(this, commands[(index + 1) % 64] % 8, 0, 0, new_type, true, iterator);
+				int new_type = commands[(index + 2) % 256] % 8;
+				BotCommands.multiply(this, commands[(index + 1) % 256] % 8, 0, 0, new_type, true, iterator);
 				index += 3;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 43) {//добавление в цепочку абсолютно
-				int new_type = commands[(index + 1) % 64] % 8;
+				int new_type = commands[(index + 1) % 256] % 8;
 				BotCommands.multiply(this, rotate, 0, 0, new_type, true, iterator);
 				index += 2;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 44) {//сколько у меня связей в цепочке
 				int c = BotUtils.count_chains(this);
-				int ind = commands[(index + 1) % 64] % 8;
+				int ind = commands[(index + 1) % 256] % 8;
 				if (c > ind) {//
-					index = commands[(index + 2) % 64];
+					index = commands[(index + 2) % 256];
 				}else if (c < ind) {//
-					index = commands[(index + 3) % 64];
+					index = commands[(index + 3) % 256];
 				}else {//
-					index = commands[(index + 4) % 64];
+					index = commands[(index + 4) % 256];
 				}
 			}else if (command == 45) {//присоеденить соседа к цепочке относительно
-				BotCommands.add_neighbour_to_chain(this, commands[(index + 1) % 64] % 8);
+				BotCommands.add_neighbour_to_chain(this, commands[(index + 1) % 256] % 8);
 				index += 2;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 46) {//присоеденить соседа к цепочке абсолютно
 				BotCommands.add_neighbour_to_chain(this, rotate);
 				index += 1;
-				index %= 64;
+				index %= 256;
 				break;
 			}else {
 				index += command;
-				index %= 64;
+				index %= 256;
 			}
 		}
 	}

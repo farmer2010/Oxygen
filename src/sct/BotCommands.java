@@ -146,7 +146,7 @@ public class BotCommands {
 	public static int see_org(Bot bot, int rot, int ind) {
 		int[] pos = Constant.get_rotate_position(rot, new int[] {bot.xpos, bot.ypos});
 		if (pos[1] >= 0 & pos[1] < Constant.world_scale[1]) {
-			if (bot.org_map[pos[0]][pos[1]] >= ind * 15) {
+			if (bot.org_map[pos[0]][pos[1]] >= ind * 4) {
 				return(0);
 			}else {
 				return(1);
@@ -170,12 +170,12 @@ public class BotCommands {
 					}else {
 						new_color = new Color(Constant.border(bot.color.getRed() + bot.rand.nextInt(-12, 13), 255, 0), Constant.border(bot.color.getGreen() + bot.rand.nextInt(-12, 13), 255, 0), Constant.border(bot.color.getBlue() + bot.rand.nextInt(-12, 13), 255, 0));
 					}
-					int[] new_brain = new int[64];
-					for (int i = 0; i < 64; i++) {
+					int[] new_brain = new int[256];
+					for (int i = 0; i < 256; i++) {
 						new_brain[i] = bot.commands[i];
 					}
 					if (bot.rand.nextInt(4) == 0) {//мутация
-						new_brain[bot.rand.nextInt(64)] = bot.rand.nextInt(64);
+						new_brain[bot.rand.nextInt(256)] = bot.rand.nextInt(256);
 					}
 					Bot new_bot = new Bot(
 						pos[0],
