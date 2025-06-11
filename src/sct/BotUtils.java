@@ -26,7 +26,7 @@ public class BotUtils {
 	//
 	public static double photo_energy(Bot bot, int sector) {
 		int count = BotUtils.bot_count(bot);
-		double enr = Constant.pht_energy_list[sector] * (bot.org_map[bot.xpos][bot.ypos] / Constant.pht_coeff) * Constant.pht_neighbours_coeff[count];
+		double enr = Constant.pht_energy_list[sector] * (bot.org_map[bot.xpos][bot.ypos] / Constant.pht_coeff) * Constant.pht_neighbours_coeff[count] * 2;
 		return(enr);
 	}
 	//

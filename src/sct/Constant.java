@@ -18,7 +18,7 @@ public class Constant {
 	public static int[] zoom_sizes = {2, 5, 10};
 	//
 	public static double org_recycle_ox_coeff = 0.00002;
-	public static double life_ox_coeff = 0.002;
+	public static double life_ox_coeff = 0.0019;
 	public static double move_ox_coeff = 0.003;
 	public static double attack_ox_coeff = 0.01;
 	public static double pht_ox_coeff = 0.003;
@@ -27,9 +27,9 @@ public class Constant {
 	public static double ox_distribution_min = 0.001;
 	//
 	public static double life_co2_coeff = 0.0004;
-	public static double pht_co2_coeff = 0.0003;
-	public static double org_recycle_co2_coeff = 0.0001;
-	public static double die_co2_coeff = 0.0005;
+	public static double pht_co2_coeff = 0.00033;
+	public static double org_recycle_co2_coeff = 0.00016;
+	public static double die_co2_coeff = 0.0008;
 	//
 	public static double org_die_level = 800.0;
 	public static int age_minus_coeff = 20;
@@ -40,7 +40,7 @@ public class Constant {
 	public static int max_age = 1500;
 	//
 	public static double pht_coeff = 400;
-	public static int[] pht_energy_list = {12, 11, 10, 9, 8, 7, 6, 5};
+	public static int[] pht_energy_list = {10, 9, 8, 7, 6, 5, 4, 3};
 	public static double[] pht_neighbours_coeff = {1, 0.8, 0.5, 0.4, 0.3, 0.2, 0.1, 0.05, 0};
 	public static double org_recycle_coeff = 0.125;
 	//

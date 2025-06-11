@@ -185,6 +185,7 @@ public class Bot{
 						oxygen_map[xpos][ypos] = 1;
 					}
 					co2_map[xpos][ypos] -= Constant.pht_co2_coeff;
+					//System.out.println(BotUtils.photo_energy(this, sector));
 				}
 				index += 1;
 				index %= 256;
@@ -278,14 +279,14 @@ public class Bot{
 				index %= 256;
 				break;
 			}else if (command == 20) {//какая моя позиция x
-				double ind = commands[(index + 1) % 256] / 256.0;
+				double ind = commands[(index + 1) % 256] / 255.0;
 				if (xpos * 1.0 / Constant.world_scale[0] >= ind) {
 					index = commands[(index + 2) % 256];
 				}else {
 					index = commands[(index + 3) % 256];
 				}
 			}else if (command == 21) {//какая моя позиция y
-				double ind = commands[(index + 1) % 256] / 256.0;
+				double ind = commands[(index + 1) % 256] / 255.0;
 				if (ypos * 1.0 / Constant.world_scale[1] >= ind) {
 					index = commands[(index + 2) % 256];
 				}else {
@@ -379,12 +380,12 @@ public class Bot{
 					index = commands[(index + 4) % 256];
 				}
 			}else if (command == 39) {//стрелять семечком относительно
-				int rot = commands[(index + 1) % 64] % 8;
-				int time = commands[(index + 2) % 64] % 16 + 1;
-				int new_type = commands[(index + 3) % 64] % 8;
+				int rot = commands[(index + 1) % 256] % 8;
+				int time = commands[(index + 2) % 256] % 16 + 1;
+				int new_type = commands[(index + 3) % 256] % 8;
 				BotCommands.multiply(this, rot, 1, time, new_type, false, iterator);
 				index += 4;
-				index %= 64;
+				index %= 256;
 				break;
 			}else if (command == 40) {//стрелять семечком абсолютно
 				int time = commands[(index + 1) % 256] % 16 + 1;

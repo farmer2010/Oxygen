@@ -431,14 +431,6 @@ public class World extends JPanel{
 				update();
 			}
 			//
-			ListIterator<Bot> iterator = objects.listIterator();
-			while (iterator.hasNext()) {
-				Bot next_bot = iterator.next();
-				if (next_bot.killed == 1) {
-					iterator.remove();
-				}
-			}
-			//
 			repaint();
 		}
 	}
@@ -469,6 +461,14 @@ public class World extends JPanel{
 					org_count++;
 				}else {
 					b_count++;
+				}
+			}
+			//
+			ListIterator<Bot> iterator = objects.listIterator();
+			while (iterator.hasNext()) {
+				Bot next_bot = iterator.next();
+				if (next_bot.killed == 1) {
+					iterator.remove();
 				}
 			}
 			//
