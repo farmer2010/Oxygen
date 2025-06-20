@@ -76,6 +76,18 @@ public class Bot{
 				canvas.fillRect((xpos - pos[0] + w / 2) * 10, (ypos - pos[1] + h / 2) * 10, 10, 10);
 				canvas.setColor(get_color(draw_type));
 				canvas.fillRect((xpos - pos[0] + w / 2) * 10 + 1, (ypos - pos[1] + h / 2) * 10 + 1, 8, 8);
+				//
+				canvas.setColor(new Color(0, 0, 0));
+				int c = 0;
+				for (int i = 0; i < 8; i++) {
+					if (chain[i]) {
+						c++;
+						canvas.drawLine((xpos - pos[0] + w / 2) * 10 + 5, (ypos - pos[1] + h / 2) * 10 + 5, (xpos - pos[0] + w / 2) * 10 + 5 + Constant.movelist[i][0] * 4, (ypos - pos[1] + h / 2) * 10 + 5 + Constant.movelist[i][1] * 4);
+					}
+				}
+				if (c != 0) {//если бот в цепоке, рисуем на нем квадрат
+					canvas.fillRect((xpos - pos[0] + w / 2) * 10 + 3, (ypos - pos[1] + h / 2) * 10 + 3, 4, 4);
+				}
 			}
 		}
 	}
