@@ -23,7 +23,7 @@ public class Constant {
 	public static double attack_ox_coeff = 0.01;
 	public static double pht_ox_coeff = 0.003;
 	public static double die_ox_coeff = 0.01;
-	public static double evaporation_ox_coeff = 0.999;
+	public static double evaporation_ox_coeff = 0.99;
 	public static double ox_distribution_min = 0.001;
 	//
 	public static double life_co2_coeff = 0.0004;

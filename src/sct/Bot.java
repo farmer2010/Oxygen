@@ -23,7 +23,7 @@ public class Bot{
 	public Color clan_color = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
 	public double energy;
 	public int age = Constant.max_age;
-	public int memory = 0;
+	//public int memory = 0;
 	public int type;
 	public int[] commands = new int[256];
 	public int index = 0;

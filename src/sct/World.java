@@ -686,8 +686,18 @@ public class World extends JPanel{
     			new_bot.clan_color = new Color(Integer.parseInt(bot_data[12]), Integer.parseInt(bot_data[13]), Integer.parseInt(bot_data[14]));
     			new_bot.pht_org_block = Integer.parseInt(bot_data[16]);
     			new_bot.seed_time = Integer.parseInt(bot_data[17]);
+    			new_bot.type = Integer.parseInt(bot_data[18]);
+    			int a = Integer.parseInt(bot_data[19]);
+    			int d = 128;
+    			for (int h = 0; h < 8; h++) {
+    				new_bot.chain[h] = a >= d;
+    				if (a >= d) {
+    					a -= d;
+    				}
+    				d /= 2;
+    			}
     			for (int j = 0; j < 256; j++) {
-    				new_bot.commands[j] = Integer.parseInt(bot_data[18 + j]);;
+    				new_bot.commands[j] = Integer.parseInt(bot_data[20 + j]);;
     			}
     			Map[Integer.parseInt(bot_data[2])][Integer.parseInt(bot_data[3])] = new_bot;
     			objects.add(new_bot);
@@ -700,10 +710,11 @@ public class World extends JPanel{
 	//
 	public void save_world() {//сохранить мир
 		try {
-			//сохранение кислорода
 			FileWriter fileWriter = new FileWriter("saved worlds/" + for_load.getText() + ".dat");
 	        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+	        //
 			bufferedWriter.write(String.valueOf(steps) + ";");
+			//сохранение кислорода
 			for (int x = 0; x < Constant.world_scale[0]; x++) {
 				for (int y = 0; y < Constant.world_scale[1]; y++) {
 					bufferedWriter.write(String.valueOf(oxygen_map[x][y]) + "'");
@@ -747,7 +758,18 @@ public class World extends JPanel{
 				bufferedWriter.write(String.valueOf(b.index) + "'");//                15 - индекс генома
 				bufferedWriter.write(String.valueOf(b.pht_org_block) + "'");//        16 - специализация
 				bufferedWriter.write(String.valueOf(b.seed_time) + "'");//            17 - сколько еще лететь(если семечко)
-				for (int i = 0; i < 256; i++) {//                                     18 - 273 - геном
+				bufferedWriter.write(String.valueOf(b.type) + "'");//                 18 - тип бота
+				bufferedWriter.write(String.valueOf(//                                19 - многоклеточные цепочки
+						(b.chain[0] ? 1 : 0) * 128 +
+						(b.chain[1] ? 1 : 0) * 64 + 
+						(b.chain[2] ? 1 : 0) * 32 + 
+						(b.chain[3] ? 1 : 0) * 16 + 
+						(b.chain[4] ? 1 : 0) * 8 + 
+						(b.chain[5] ? 1 : 0) * 4 + 
+						(b.chain[6] ? 1 : 0) * 2 + 
+						(b.chain[7] ? 1 : 0) * 1
+						) + "'");
+				for (int i = 0; i < 256; i++) {//                                     20 - 275 - геном
 					bufferedWriter.write(String.valueOf(b.commands[i]) + "'");
 				}
 				bufferedWriter.write(":");
