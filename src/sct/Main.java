@@ -1,6 +1,8 @@
 package sct;
 import java.io.File;
 import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 
 public class Main{
 	public static void main(String[] args) {
@@ -15,8 +17,11 @@ public class Main{
 		JFrame frame = new JFrame("Oxygen");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new World());
-		frame.setSize(1920, 1080);
-		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Dimension screenSize = toolkit.getScreenSize();
+		frame.setSize(screenSize);
+        //frame.setSize(720, 405);
+		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		frame.setUndecorated(true);
 		frame.setVisible(true);
 	}

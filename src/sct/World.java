@@ -280,7 +280,7 @@ public class World extends JPanel{
 		canvas.setColor(black);//рисуем текст
 		canvas.setFont(new Font("arial", Font.BOLD, 18));
 		canvas.drawString("Main: ", Constant.W - 300, 20);
-		canvas.drawString("version 4 ", Constant.W - 300, 40);
+		canvas.drawString("version 5", Constant.W - 300, 40);
 		canvas.drawString("steps: " + String.valueOf(steps), Constant.W - 300, 60);
 		canvas.drawString("objects: " + String.valueOf(obj_count) + ", bots: " + String.valueOf(b_count), Constant.W - 300, 80);
 		canvas.drawString("render type: " + Constant.draw_type_names[draw_type] + " view", Constant.W - 300, 100);
@@ -298,6 +298,7 @@ public class World extends JPanel{
 		canvas.drawString("Oxygen: " + String.valueOf(count_ox), Constant.W - 300, 760);
 		canvas.drawString("Organics: " + String.valueOf(count_org), Constant.W - 300, 780);
 		canvas.drawString("Co2: " + String.valueOf(count_co2), Constant.W - 300, 800);
+		canvas.drawString("Organics die level: " + String.valueOf(Constant.org_die_level), Constant.W - 300, 820);
 		//
 		if (selection != null) {//данные о выбранном боте
 			canvas.drawString("energy: " + String.valueOf(selection.energy) + ", : " + String.valueOf(0), Constant.W - 300, 360);
@@ -484,6 +485,10 @@ public class World extends JPanel{
 			WorldUtils.gas(oxygen_map, org_map);
 			WorldUtils.gas(co2_map, org_map);
 			//WorldUtils.minerals(mnr_map);
+			//
+			if (steps > 80000 && rand.nextInt(100) == 0) {
+				Constant.org_die_level = Math.min(Math.max(Constant.org_die_level + rand.nextInt(-5, 6), 350), 1500);
+			}
 			//
 			if (rec && steps % 25 == 0) {
 				record();

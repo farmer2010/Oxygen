@@ -1,12 +1,19 @@
 package sct;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 
 public class Constant {
-	public static int W = 1920;
-	public static int H = 1080;
+	static Toolkit toolkit = Toolkit.getDefaultToolkit();
+    static Dimension screenSize = toolkit.getScreenSize();
+    //
+	public static int W = (int) screenSize.getWidth();
+	public static int H = (int) screenSize.getHeight();
+    //public static int W = 720;
+	//public static int H = 405;
 	public static int size = 2;
-	public static int[] world_scale = {810, 540};
+	public static int[] world_scale = {(W - 300) / size, H / 2};
 	public static int starting_bot_count = 45000;
 	public static double starting_ox = 0.02;
 	public static double starting_co2 = 0.02;
