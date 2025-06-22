@@ -52,6 +52,7 @@ public class World extends JPanel{
 	int[] zoom_disp_pos = {100, 100};
 	int delay = 10;//скорость
 	//запись, пауза, отрисовка
+	boolean settings = false;
 	boolean pause = false;//пауза
 	boolean render = true;//отрисовка
 	boolean sh_brain = false;//отрисовка мозга выбранного существа
@@ -66,6 +67,9 @@ public class World extends JPanel{
 	JButton render_button = new JButton("Render: on");
 	JButton record_button = new JButton("Record: off");
 	JSlider skip_slider = new JSlider(1, 10, 2);//сколько шагов пропускать
+	JSlider org_die_level_slider = new JSlider(0, 1500, 800);
+	JButton settings_button = new JButton("Settings: off");
+	SettingsPanel panel = new SettingsPanel();
 	//
 	JTextField for_load;
 	public World() {
@@ -242,6 +246,16 @@ public class World extends JPanel{
         x5_button.setBounds(Constant.W - 100, 705, 95, 20);
         add(x5_button);
         //
+        //настройки
+        //
+        settings_button.addActionListener(e -> sets());
+        settings_button.setBounds(Constant.W - 300, 810, 250, 35);
+        add(settings_button);
+        //
+        panel.setBounds(0, 0, Constant.W - 300, Constant.H);
+        panel.setVisible(false);
+        add(panel);
+        //
         kill_all();//заполняем мир стартовыми ресурсами
 		//
 		timer.start();
@@ -298,7 +312,6 @@ public class World extends JPanel{
 		canvas.drawString("Oxygen: " + String.valueOf(count_ox), Constant.W - 300, 760);
 		canvas.drawString("Organics: " + String.valueOf(count_org), Constant.W - 300, 780);
 		canvas.drawString("Co2: " + String.valueOf(count_co2), Constant.W - 300, 800);
-		canvas.drawString("Organics die level: " + String.valueOf(Constant.org_die_level), Constant.W - 300, 820);
 		//
 		if (selection != null) {//данные о выбранном боте
 			canvas.drawString("energy: " + String.valueOf(selection.energy) + ", : " + String.valueOf(0), Constant.W - 300, 360);
@@ -486,9 +499,10 @@ public class World extends JPanel{
 			WorldUtils.gas(co2_map, org_map);
 			//WorldUtils.minerals(mnr_map);
 			//
-			if (steps > 80000 && rand.nextInt(100) == 0) {
-				Constant.org_die_level = Math.min(Math.max(Constant.org_die_level + rand.nextInt(-5, 6), 350), 1500);
-			}
+			//if (steps > 50000 && rand.nextInt(10) == 0) {
+			//	Constant.org_die_level = Math.min(Math.max(Constant.org_die_level + rand.nextInt(-10, 11), 350), 1500);
+			//}
+			//Constant.org_die_level = org_die_level_slider.getValue();
 			//
 			if (rec && steps % 25 == 0) {
 				record();
@@ -497,45 +511,47 @@ public class World extends JPanel{
 	}
 	//
 	public void update_mouse(int[] botpos, int select_work) {
-		if (mouse == 0 && select_work == 1) {//select
-			if (Map[botpos[0]][botpos[1]] != null && Map[botpos[0]][botpos[1]].state == 0) {
-				for(Bot b: objects) {
-					if (b.xpos == botpos[0] && b.ypos == botpos[1]) {
-						selection = b;
-						save_button.setEnabled(true);
-						show_brain_button.setEnabled(true);
+		if (!settings) {
+			if (mouse == 0 && select_work == 1) {//select
+				if (Map[botpos[0]][botpos[1]] != null && Map[botpos[0]][botpos[1]].state == 0) {
+					for(Bot b: objects) {
+						if (b.xpos == botpos[0] && b.ypos == botpos[1]) {
+							selection = b;
+							save_button.setEnabled(true);
+							show_brain_button.setEnabled(true);
+						}
+					}
+				}else {
+					selection = null;
+					save_button.setEnabled(false);
+					show_brain_button.setEnabled(false);
+					sh_brain = false;
+				}
+				//
+				if (zoom == 0) {
+					zoom_disp_pos[0] = botpos[0];
+					zoom_disp_pos[1] = botpos[1];
+				}else {
+					int w = Constant.world_scale[0] * Constant.size / Constant.zoom_sizes[zoom];
+					int h = Constant.world_scale[1] * Constant.size / Constant.zoom_sizes[zoom];
+					zoom_disp_pos[0] = Constant.border(botpos[0], Constant.world_scale[0] - w / 2, w / 2);
+					zoom_disp_pos[1] = Constant.border(botpos[1], Constant.world_scale[1] - h / 2, h / 2);
+				}
+			}else if (mouse == 1) {//set
+				if (for_set != null) {
+					if (Map[botpos[0]][botpos[1]] == null) {
+						objects.add(for_set);
+						Map[botpos[0]][botpos[1]] = for_set;
 					}
 				}
-			}else {
-				selection = null;
-				save_button.setEnabled(false);
-				show_brain_button.setEnabled(false);
-				sh_brain = false;
-			}
-			//
-			if (zoom == 0) {
-				zoom_disp_pos[0] = botpos[0];
-				zoom_disp_pos[1] = botpos[1];
-			}else {
-				int w = Constant.world_scale[0] * Constant.size / Constant.zoom_sizes[zoom];
-				int h = Constant.world_scale[1] * Constant.size / Constant.zoom_sizes[zoom];
-				zoom_disp_pos[0] = Constant.border(botpos[0], Constant.world_scale[0] - w / 2, w / 2);
-				zoom_disp_pos[1] = Constant.border(botpos[1], Constant.world_scale[1] - h / 2, h / 2);
-			}
-		}else if (mouse == 1) {//set
-			if (for_set != null) {
-				if (Map[botpos[0]][botpos[1]] == null) {
-					objects.add(for_set);
-					Map[botpos[0]][botpos[1]] = for_set;
-				}
-			}
-		}else if (mouse == 2){//remove
-			if (Map[botpos[0]][botpos[1]] != null) {
-				for(Bot b: objects) {
-					if (b.xpos == botpos[0] && b.ypos == botpos[1]) {
-						b.energy = 0;
-						b.killed = 1;
-						Map[botpos[0]][botpos[1]] = null;
+			}else if (mouse == 2){//remove
+				if (Map[botpos[0]][botpos[1]] != null) {
+					for(Bot b: objects) {
+						if (b.xpos == botpos[0] && b.ypos == botpos[1]) {
+							b.energy = 0;
+							b.killed = 1;
+							Map[botpos[0]][botpos[1]] = null;
+						}
 					}
 				}
 			}
@@ -622,11 +638,28 @@ public class World extends JPanel{
 	}
 	//
 	public void start_stop() {//пауза
-		pause = !pause;
-		if (pause) {
-			stop_button.setText("Start");
+		if (!settings) {
+			pause = !pause;
+			if (pause) {
+				stop_button.setText("Start");
+			}else {
+				stop_button.setText("Stop");
+			}
+		}
+	}
+	//
+	public void sets() {//настройки
+		settings = !settings;
+		pause = settings;
+		panel.setVisible(settings);
+		if (settings) {
+			settings_button.setText("Settings: on");
+			selection = null;
+			sh_brain = false;
+			panel.timer.start();
 		}else {
-			stop_button.setText("Stop");
+			settings_button.setText("Settings: off");
+			panel.timer.stop();
 		}
 	}
 	//

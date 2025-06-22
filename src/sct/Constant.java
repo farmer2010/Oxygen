@@ -22,7 +22,8 @@ public class Constant {
 	public static double co2_render_maximum_coeff = 0.125;
 	public static String[] draw_type_names = {"predators", "energy", "color", "clans", "age", "types", "chains"};
 	public static String[] mouse_func_names = {"select", "set", "remove"};
-	public static int[] zoom_sizes = {2, 5, 10};
+	public static int[] zoom_sizes = {size, 5, 10};
+	public static int genome_size = 256;
 	//
 	public static double org_recycle_ox_coeff = 0.00002;
 	public static double life_ox_coeff = 0.0019;
@@ -45,12 +46,11 @@ public class Constant {
 	public static int energy_for_multiply = 80;
 	public static int energy_for_auto_multiply = 800;
 	public static int max_age = 1500;
-	public static int genome_size = 256;
+	public static double org_recycle_coeff = 0.125;
 	//
 	public static double pht_coeff = 400;
 	public static int[] pht_energy_list = {10, 9, 8, 7, 6, 5, 4, 3};
 	public static double[] pht_neighbours_coeff = {1, 0.8, 0.5, 0.4, 0.3, 0.2, 0.1, 0.05, 0};
-	public static double org_recycle_coeff = 0.125;
 	//
 	public static int[][] movelist = {
 		{0, -1},
