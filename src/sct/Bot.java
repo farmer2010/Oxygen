@@ -52,6 +52,7 @@ public class Bot{
 		co2_map = new_co2_map;
 		org_map = new_org_map;
 		type = new_type;
+		//type = 0;
 		//
 		for (int i = 0; i < 256; i++) {//заполняем мозг случайными числами
 			commands[i] = rand.nextInt(256);
@@ -92,12 +93,20 @@ public class Bot{
 		}
 	}
 	public int Update(ListIterator<Bot> iterator) {
+		if (age <= 0 || org_map[xpos][ypos] >= Constant.org_die_level || energy <= 0) {//смерть от старости или от органики
+			BotUtils.die_with_organics(this);
+			return(0);
+		}
 		if (killed == 0) {
 			if (state == 0) {//если бот
 				age -= (int)(oxygen_map[xpos][ypos] * Constant.age_minus_coeff) + 1;
 				energy -= Constant.energy_for_life;
 				//
-				int count = BotUtils.bot_count(this) + 1;//автоматическое деление и мозг
+				if (energy > 1000) {//ограничитель количества энергии
+					energy = 1000;
+				}
+				//
+				int count = BotUtils.bot_count(this) + 1;//количество соседей
 				if (BotUtils.count_oxygen(this) >= Constant.life_ox_coeff * count) {
 					oxygen_map[xpos][ypos] -= Constant.life_ox_coeff * count;
 					co2_map[xpos][ypos] += Constant.life_co2_coeff * count;
@@ -107,21 +116,7 @@ public class Bot{
 					}
 				}
 				update_chain();//обновление цепочек
-				//
-				if (energy > 1000) {//ограничитель количества энергии
-					energy = 1000;
-				}
-				//
-				if (age <= 0 || org_map[xpos][ypos] >= Constant.org_die_level || energy <= 0) {//смерть от старости или от органики
-					BotUtils.die_with_organics(this);
-					return(0);
-				}
 			}else if (state == 1){//если семечко
-				if (org_map[xpos][ypos] >= Constant.org_die_level) {//умираем от переизбытка органики
-					BotUtils.die_with_organics(this);
-					return(0);
-				}
-				//
 				int res = BotCommands.move(this, rotate);//двигаемся
 				if (res == 0) {//столкновение
 					int[] pos = Constant.get_rotate_position(rotate, new int[] {xpos, ypos});
