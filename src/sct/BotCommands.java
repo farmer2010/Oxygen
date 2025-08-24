@@ -93,53 +93,86 @@ public class BotCommands {
 	//
 	public static void recycle_organics_under(Bot bot, int org) {
 		int[] pos = {bot.xpos, bot.ypos};
-		if (pos[1] >= 0 & pos[1] < Constant.world_scale[1]) {
-			double ox = BotUtils.count_oxygen(bot);
-			if (bot.org_map[pos[0]][pos[1]] > org) {
+		if (bot.org_map[pos[0]][pos[1]] > org) {
+			if (bot.mitochondria[0] % 2 == 0) {
+				double ox = BotUtils.count_oxygen(bot);
 				if (ox >= org * Constant.org_recycle_ox_coeff) {
 					bot.oxygen_map[bot.xpos][bot.ypos] -= org * Constant.org_recycle_ox_coeff;
 					bot.co2_map[bot.xpos][bot.ypos] += org * Constant.org_recycle_co2_coeff;
 					bot.energy += org;
 					bot.org_map[pos[0]][pos[1]] -= org;
-					bot.go_yellow();
-				}
-			}else {
-				if (ox >= bot.org_map[pos[0]][pos[1]] * Constant.org_recycle_ox_coeff) {
-					bot.oxygen_map[bot.xpos][bot.ypos] -= bot.org_map[pos[0]][pos[1]] * Constant.org_recycle_ox_coeff;
-					bot.co2_map[bot.xpos][bot.ypos] += bot.org_map[pos[0]][pos[1]] * Constant.org_recycle_co2_coeff;
-					bot.energy += bot.org_map[pos[0]][pos[1]];
-					if (bot.org_map[pos[0]][pos[1]] != 0) {
+					if (org > 0) {
 						bot.go_yellow();
 					}
-					bot.org_map[pos[0]][pos[1]] = 0;
+				}
+			}else if (bot.mitochondria[0] % 2 == 1) {
+				bot.energy += org;
+				bot.org_map[pos[0]][pos[1]] -= org;
+				if (org > 0) {
+					bot.go_yellow();
 				}
 			}
 		}
 	}
 	//
-	public static void recycle_organics(Bot bot, int rot, int org) {
+	public static void recycle_organics(Bot bot, int rot, double org) {
 		int[] pos = Constant.get_rotate_position(rot, new int[] {bot.xpos, bot.ypos});
 		if (pos[1] >= 0 & pos[1] < Constant.world_scale[1]) {
-			double ox = BotUtils.count_oxygen(bot);
+			org = Math.min(org, bot.org_map[pos[0]][pos[1]]);
 			if (bot.org_map[pos[0]][pos[1]] > org) {
-				if (ox >= org * Constant.org_recycle_ox_coeff) {
-					bot.oxygen_map[bot.xpos][bot.ypos] -= org * Constant.org_recycle_ox_coeff;
-					bot.co2_map[bot.xpos][bot.ypos] += org * Constant.org_recycle_co2_coeff;
+				if (bot.mitochondria[0] % 2 == 0) {
+					double ox = BotUtils.count_oxygen(bot);
+					if (ox >= org * Constant.org_recycle_ox_coeff) {
+						bot.oxygen_map[bot.xpos][bot.ypos] -= org * Constant.org_recycle_ox_coeff;
+						bot.co2_map[bot.xpos][bot.ypos] += org * Constant.org_recycle_co2_coeff;
+						bot.energy += org;
+						bot.org_map[pos[0]][pos[1]] -= org;
+						if (org > 0) {
+							bot.go_yellow();
+						}
+					}
+				}else if (bot.mitochondria[0] % 2 == 1) {
 					bot.energy += org;
 					bot.org_map[pos[0]][pos[1]] -= org;
-					bot.go_yellow();
-				}
-			}else {
-				if (ox >= bot.org_map[pos[0]][pos[1]] * Constant.org_recycle_ox_coeff) {
-					bot.oxygen_map[bot.xpos][bot.ypos] -= bot.org_map[pos[0]][pos[1]] * Constant.org_recycle_ox_coeff;
-					bot.co2_map[bot.xpos][bot.ypos] += bot.org_map[pos[0]][pos[1]] * Constant.org_recycle_co2_coeff;
-					bot.energy += bot.org_map[pos[0]][pos[1]];
-					if (bot.org_map[pos[0]][pos[1]] > 0) {
+					if (org > 0) {
 						bot.go_yellow();
 					}
-					bot.org_map[pos[0]][pos[1]] = 0;
 				}
 			}
+		}
+	}
+	//
+	public static void collect_energy(Bot bot, int rot, double enr) {
+		int[] pos = Constant.get_rotate_position(rot, new int[] {bot.xpos, bot.ypos});
+		if (pos[1] >= 0 & pos[1] < Constant.world_scale[1]) {
+			enr = Math.min(enr, bot.energy_map[pos[0]][pos[1]]);
+			if (enr > 0) {
+				bot.energy += enr;
+				bot.energy_map[pos[0]][pos[1]] -= enr;
+				bot.go_blue2();
+			}
+		}
+	}
+	//
+	public static void collect_energy_under(Bot bot, double enr) {
+		enr = Math.min(enr, bot.energy_map[bot.xpos][bot.ypos]);
+		if (enr > 0) {
+			bot.energy += enr;
+			bot.energy_map[bot.xpos][bot.ypos] -= enr;
+			bot.go_blue2();
+		}
+	}
+	//
+	public static int see_enr(Bot bot, int rot, int ind) {
+		int[] pos = Constant.get_rotate_position(rot, new int[] {bot.xpos, bot.ypos});
+		if (pos[1] >= 0 & pos[1] < Constant.world_scale[1]) {
+			if (bot.energy_map[pos[0]][pos[1]] >= ind * 4) {
+				return(0);
+			}else {
+				return(1);
+			}
+		}else {
+			return(2);
 		}
 	}
 	//
@@ -171,11 +204,15 @@ public class BotCommands {
 						new_color = new Color(Constant.border(bot.color.getRed() + bot.rand.nextInt(-12, 13), 255, 0), Constant.border(bot.color.getGreen() + bot.rand.nextInt(-12, 13), 255, 0), Constant.border(bot.color.getBlue() + bot.rand.nextInt(-12, 13), 255, 0));
 					}
 					int[] new_brain = new int[256];
+					int[] new_mitochondria = new int[1];
 					for (int i = 0; i < 256; i++) {
 						new_brain[i] = bot.commands[i];
 					}
 					if (bot.rand.nextInt(4) == 0) {//мутация
 						new_brain[bot.rand.nextInt(256)] = bot.rand.nextInt(256);
+						if (bot.rand.nextInt(16) == 0) {
+							new_mitochondria[0] = bot.rand.nextInt(256);
+						}
 					}
 					Bot new_bot = new Bot(
 						pos[0],
@@ -185,12 +222,15 @@ public class BotCommands {
 						new_type,
 						bot.oxygen_map,
 						bot.co2_map,
+						bot.mnr_map,
 						bot.org_map,
+						bot.energy_map,
 						bot.map,
 						bot.objects
 					);
 					bot.energy /= 2;
 					new_bot.commands = new_brain;
+					new_bot.mitochondria = new_mitochondria;
 					new_bot.clan_color = bot.clan_color;
 					//
 					if (seed == 1) {

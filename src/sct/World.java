@@ -32,6 +32,7 @@ public class World extends JPanel{
 	double[][] co2_map;//углекислота
 	double[][] org_map;//органика
 	double[][] mnr_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];//минералы
+	double[][] energy_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];//энергия
 	int[][] height_map = new int[Constant.world_scale[0]][Constant.world_scale[1]];//карта высот
 	//цвета
 	Color gray = new Color(100, 100, 100);
@@ -153,6 +154,11 @@ public class World extends JPanel{
         co2_button.setBounds(Constant.W - 200, 305, 95, 20);
         add(co2_button);
         //
+        JButton energy_b_button = new JButton("Energy");
+        energy_b_button.addActionListener(new change_gas_draw_type(6));
+        energy_b_button.setBounds(Constant.W - 100, 305, 95, 20);
+        add(energy_b_button);
+        //
         //смена функции мыши
         //
         JButton select_button = new JButton("Select");
@@ -249,7 +255,7 @@ public class World extends JPanel{
         //настройки
         //
         settings_button.addActionListener(e -> sets());
-        settings_button.setBounds(Constant.W - 300, 810, 250, 35);
+        settings_button.setBounds(Constant.W - 300, 830, 250, 35);
         add(settings_button);
         //
         panel.setBounds(0, 0, Constant.W - 300, Constant.H);
@@ -277,11 +283,13 @@ public class World extends JPanel{
 				}else if (gas_draw_type == 2){
 					Draw.draw_org(canvas, org_map, zoom, zoom_disp_pos);
 				}else if (gas_draw_type == 3) {
-					Draw.draw_mnr(canvas, mnr_map);
+					Draw.draw_mnr(canvas, mnr_map, org_map, zoom, zoom_disp_pos);
 				}else if (gas_draw_type == 4) {
 					Draw.draw_co2(canvas, co2_map, org_map, zoom, zoom_disp_pos);
 				}else if (gas_draw_type == 5) {
 					Draw.draw_height(canvas, height_map, zoom, zoom_disp_pos);
+				}else if (gas_draw_type == 6) {
+					Draw.draw_energy(canvas, energy_map, zoom, zoom_disp_pos);
 				}
 			}else {
 				//draw_height(canvas, zoom);
@@ -312,6 +320,7 @@ public class World extends JPanel{
 		canvas.drawString("Oxygen: " + String.valueOf(count_ox), Constant.W - 300, 760);
 		canvas.drawString("Organics: " + String.valueOf(count_org), Constant.W - 300, 780);
 		canvas.drawString("Co2: " + String.valueOf(count_co2), Constant.W - 300, 800);
+		canvas.drawString("Minerals: " + String.valueOf(count_mnr), Constant.W - 300, 820);
 		//
 		if (selection != null) {//данные о выбранном боте
 			canvas.drawString("energy: " + String.valueOf(selection.energy) + ", : " + String.valueOf(0), Constant.W - 300, 360);
@@ -497,12 +506,7 @@ public class World extends JPanel{
 			//
 			WorldUtils.gas(oxygen_map, org_map);
 			WorldUtils.gas(co2_map, org_map);
-			//WorldUtils.minerals(mnr_map);
-			//
-			//if (steps > 50000 && rand.nextInt(10) == 0) {
-			//	Constant.org_die_level = Math.min(Math.max(Constant.org_die_level + rand.nextInt(-10, 11), 350), 1500);
-			//}
-			//Constant.org_die_level = org_die_level_slider.getValue();
+			WorldUtils.minerals(mnr_map);
 			//
 			if (rec && steps % 25 == 0) {
 				record();
@@ -575,10 +579,17 @@ public class World extends JPanel{
 						0,
 						oxygen_map,
 						co2_map,
+						mnr_map,
 						org_map,
+						energy_map,
 						Map,
 						objects
 					);
+					if (y < Constant.world_scale[1] - Constant.world_scale[1] * (1.0 / 8 * 2)) {
+						new_bot.mitochondria[0] = 0;
+					}else {
+						new_bot.mitochondria[0] = 1;
+					}
 					objects.add(new_bot);
 					Map[x][y] = new_bot;
 					break;
@@ -596,6 +607,7 @@ public class World extends JPanel{
 		oxygen_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
 		co2_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
 		org_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
+		energy_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
 		mnr_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
 		//стартовые ресурсы
 		for (int x = 0; x < Constant.world_scale[0]; x++) {
@@ -603,7 +615,8 @@ public class World extends JPanel{
 				oxygen_map[x][y] = Constant.starting_ox;
 				co2_map[x][y] = Constant.starting_co2;
 				org_map[x][y] = Constant.starting_org;
-				mnr_map[x][y] = 0;
+				energy_map[x][y] = Constant.starting_energy;
+				mnr_map[x][y] = Constant.starting_minerals;
 				Map[x][y] = null;
 				height_map[x][y] = (int)(noise.sumOctaves(8, x, y, 0.5F, 0.007F, 0, 1000));
 			}
@@ -710,7 +723,9 @@ public class World extends JPanel{
     				0,
     				oxygen_map,
     				co2_map,
+    				mnr_map,
     				org_map,
+    				energy_map,
     				Map,
     				objects
     			);

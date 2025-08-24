@@ -6,21 +6,63 @@ public class WorldUtils {
 	public static Random rand = new Random();
 	public static void minerals(double[][] mnr_map) {//минералы
 		//приход минералов
-		int ymin = Constant.world_scale[1] - Constant.world_scale[1] / 8 * 2;
+		int ymin = Constant.world_scale[1] - (int)(Constant.world_scale[1] / 8.0 * 2);
 		for (int i = 0; i < 100; i++) {
 			int x = rand.nextInt(Constant.world_scale[0]);
 			int y = rand.nextInt(ymin, Constant.world_scale[1]);
-			mnr_map[x][y] += rand.nextInt(10, 30);
-			if (mnr_map[x][y] > 1000) {
-				mnr_map[x][y] = 1000;
+			mnr_map[x][y] += rand.nextInt(1, 3);
+			if (mnr_map[x][y] > Constant.minerals_max) {
+				mnr_map[x][y] = Constant.minerals_max;
 			}
 		}
 		//логика
 		double[][] new_map = new double[Constant.world_scale[0]][Constant.world_scale[1]];
 		for (int x = 0; x < Constant.world_scale[0]; x++) {
 			for (int y = 0; y < Constant.world_scale[1]; y++) {
-				if (mnr_map[x][y] > 0) {
-					
+				int[] pos = Constant.get_rotate_position(4, new int[] {x, y});
+				if (pos[1] >= 0 && pos[1] < Constant.world_scale[1] && mnr_map[pos[0]][pos[1]] < Constant.minerals_max) {
+					if (mnr_map[pos[0]][pos[1]] + mnr_map[x][y] <= Constant.minerals_max) {
+						new_map[pos[0]][pos[1]] += mnr_map[x][y];
+					}else {
+						new_map[pos[0]][pos[1]] += Constant.minerals_max - mnr_map[pos[0]][pos[1]];
+						new_map[x][y] += (mnr_map[pos[0]][pos[1]] + mnr_map[x][y]) - Constant.minerals_max;
+					}
+				}else{
+					int c = 1;
+					int[] left_pos = Constant.get_rotate_position(6, new int[] {x, y});
+					int[] right_pos = Constant.get_rotate_position(2, new int[] {x, y});
+					if (mnr_map[left_pos[0]][left_pos[1]] < Constant.minerals_max) {
+						c++;
+					}
+					if (mnr_map[right_pos[0]][right_pos[1]] < Constant.minerals_max) {
+						c++;
+					}
+					double w = mnr_map[x][y] / c;
+					if (mnr_map[left_pos[0]][left_pos[1]] < Constant.minerals_max) {
+						new_map[left_pos[0]][left_pos[1]] += Math.min(w, Constant.minerals_max - mnr_map[left_pos[0]][left_pos[1]]);
+						new_map[x][y] += w - Math.min(w, Constant.minerals_max - mnr_map[left_pos[0]][left_pos[1]]);
+					}
+					if (mnr_map[right_pos[0]][right_pos[1]] < Constant.minerals_max) {
+						new_map[right_pos[0]][right_pos[1]] += Math.min(w, Constant.minerals_max - mnr_map[right_pos[0]][right_pos[1]]);
+						new_map[x][y] += w - Math.min(w, Constant.minerals_max - mnr_map[right_pos[0]][right_pos[1]]);
+					}
+					if (c > 1) {
+						new_map[x][y] += w;
+					}else if (mnr_map[x][y] >= Constant.minerals_max){
+						new_map[x][y] += mnr_map[x][y] * 0.99;
+						double s = mnr_map[x][y] * 0.01 / 9;
+						for (int j = 0; j < 8; j++) {
+							int[] p = Constant.get_rotate_position(j, new int[] {x, y});
+							if (p[1] >= 0 && p[1] < Constant.world_scale[1] && mnr_map[p[0]][p[1]] >= Constant.minerals_max) {
+								new_map[p[0]][p[1]] += s;
+							}else {
+								new_map[x][y] += s;
+							}
+						}
+						new_map[x][y] += s;
+					}else {
+						new_map[x][y] += mnr_map[x][y];
+					}
 				}
 			}
 		}

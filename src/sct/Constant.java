@@ -10,14 +10,14 @@ public class Constant {
     //
 	public static int W = (int) screenSize.getWidth();
 	public static int H = (int) screenSize.getHeight();
-    //public static int W = 720;
-	//public static int H = 405;
 	public static int size = 2;
 	public static int[] world_scale = {(W - 300) / size, H / 2};
 	public static int starting_bot_count = 45000;
 	public static double starting_ox = 0.02;
 	public static double starting_co2 = 0.02;
-	public static int starting_org = 200;
+	public static double starting_minerals = 0;
+	public static double starting_org = 200;
+	public static double starting_energy = 200;
 	public static double ox_render_maximum_coeff = 0.125;
 	public static double co2_render_maximum_coeff = 0.125;
 	public static String[] draw_type_names = {"predators", "energy", "color", "clans", "age", "types", "chains"};
@@ -25,7 +25,7 @@ public class Constant {
 	public static int[] zoom_sizes = {size, 5, 10};
 	public static int genome_size = 256;
 	//
-	public static double org_recycle_ox_coeff = 0.00002;
+	public static double org_recycle_ox_coeff = 0.000015;//0.00002
 	public static double life_ox_coeff = 0.0019;
 	public static double move_ox_coeff = 0.003;
 	public static double attack_ox_coeff = 0.01;
@@ -38,6 +38,13 @@ public class Constant {
 	public static double pht_co2_coeff = 0.00033;
 	public static double org_recycle_co2_coeff = 0.00016;
 	public static double die_co2_coeff = 0.0008;
+	public static double co2_ox_coeff = 0;
+	//
+	public static double minerals_max = 100;
+	public static double mnr_recycle_coeff = 2;
+	//
+	public static double energy_die_level = 100000000;//2500
+	public static double enr_recycle_coeff = 0.125;
 	//
 	public static double org_die_level = 800.0;
 	public static int age_minus_coeff = 20;

@@ -33,15 +33,18 @@ public class BotUtils {
 	public static void die_with_organics(Bot bot) {//умереть с появлением органики
 		bot.killed = 1;
 		bot.map[bot.xpos][bot.ypos] = null;
-		double enr = Constant.energy_for_multiply / 9.0;
+		double org = Constant.energy_for_multiply / 9.0;
+		double enr = bot.energy / 9.0;
 		for (int i = 0; i < 8; i++) {
 			int[] pos = Constant.get_rotate_position(i, new int[] {bot.xpos, bot.ypos});
 			if (pos[1] >= 0 & pos[1] < Constant.world_scale[1]) {
-				bot.org_map[pos[0]][pos[1]] += enr;
+				bot.org_map[pos[0]][pos[1]] += org;
+				bot.energy_map[pos[0]][pos[1]] += enr;
 			}
 		}
-		bot.org_map[bot.xpos][bot.ypos] += enr;
-		bot.co2_map[bot.xpos][bot.ypos] += Constant.die_co2_coeff * enr;
+		bot.org_map[bot.xpos][bot.ypos] += org;
+		bot.energy_map[bot.xpos][bot.ypos] += enr;
+		bot.co2_map[bot.xpos][bot.ypos] += Constant.die_co2_coeff * org;
 		bot.oxygen_map[bot.xpos][bot.ypos] -= Constant.die_ox_coeff;
 		if (bot.oxygen_map[bot.xpos][bot.ypos] < 0) {
 			bot.oxygen_map[bot.xpos][bot.ypos] = 0;
